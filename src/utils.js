@@ -32,6 +32,12 @@ export const CAT_FORMULAS = {
 export const CAT_ORDER = ["tec", "pas", "att", "phy", "def", "men"]
 export const CAT_LABELS = CAT_ORDER.map(c => CAT_FORMULAS[c].label)
 
+export const POSITIONS = [
+    "GK", "CB", "LB", "RB", "LWB", "RWB",
+    "CDM", "CM", "CAM", "LM", "RM",
+    "LW", "RW", "CF", "ST"
+]
+
 export function calcCategories(attrs) {
     const cats = {}
     for (const c of CAT_ORDER) {

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import {
-    ATTRS, CAT_ORDER, CAT_FORMULAS, calcCategories, calcOverall,
-    getRatingColor, getOvrBg
+    ATTRS, CAT_ORDER, CAT_FORMULAS, POSITIONS,
+    calcCategories, calcOverall, getRatingColor, getOvrBg
 } from '../utils'
 
 function AttrSlider({ attr, value, onChange }) {
@@ -32,6 +32,8 @@ function AttrSlider({ attr, value, onChange }) {
 
 export default function Modal({ player, onSave, onClose, isNew }) {
     const [name, setName] = useState(player?.name || "")
+    const [playingPosition, setPlayingPosition] = useState(player?.playingPosition || "")
+    const [jerseyNumber, setJerseyNumber] = useState(player?.jerseyNumber || "")
     const [attrs, setAttrs] = useState(() => {
         const a = {}
         ATTRS.forEach(at => a[at.key] = player?.[at.key] ?? 50)
@@ -48,14 +50,14 @@ export default function Modal({ player, onSave, onClose, isNew }) {
             position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)",
             backdropFilter: "blur(4px)", display: "flex", alignItems: "center",
             justifyContent: "center", zIndex: 999, padding: 16
-        }}
-            onClick={onClose}>
+        }} onClick={onClose}>
             <div onClick={e => e.stopPropagation()} style={{
                 background: "linear-gradient(145deg,#1a1a2e,#16213e)",
                 borderRadius: 16, width: "100%", maxWidth: 720, maxHeight: "90vh",
                 overflow: "auto", boxShadow: "0 16px 64px rgba(0,0,0,0.6)",
                 border: "1px solid rgba(255,255,255,0.1)"
             }}>
+                {/* Header */}
                 <div style={{
                     padding: "20px 24px 12px",
                     borderBottom: "1px solid rgba(255,255,255,0.08)",
@@ -96,7 +98,10 @@ export default function Modal({ player, onSave, onClose, isNew }) {
                         <button onClick={() => {
                             if (!name.trim()) return
                             onSave({
-                                ...player, ...attrs, name: name.trim(),
+                                ...player, ...attrs,
+                                name: name.trim(),
+                                playingPosition,
+                                jerseyNumber: jerseyNumber ? String(jerseyNumber) : "",
                                 id: player?.id || Date.now().toString()
                             })
                         }} style={{
@@ -108,6 +113,56 @@ export default function Modal({ player, onSave, onClose, isNew }) {
                     </div>
                 </div>
 
+                {/* Position & Jersey Number */}
+                <div style={{
+                    padding: "14px 24px", borderBottom: "1px solid rgba(255,255,255,0.06)",
+                    display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center"
+                }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{
+                            fontSize: 11, fontWeight: 600,
+                            color: "rgba(255,255,255,0.5)", fontFamily: "system-ui"
+                        }}>
+                            Position
+                        </span>
+                        <select value={playingPosition}
+                            onChange={e => setPlayingPosition(e.target.value)}
+                            style={{
+                                background: "rgba(255,255,255,0.06)",
+                                border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8,
+                                padding: "7px 12px", color: "#2ecc40", fontSize: 13,
+                                fontWeight: 700, fontFamily: "system-ui", outline: "none",
+                                cursor: "pointer"
+                            }}>
+                            <option value="" style={{ background: "#1a1a2e" }}>Select...</option>
+                            {POSITIONS.map(p => (
+                                <option key={p} value={p} style={{ background: "#1a1a2e" }}>{p}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{
+                            fontSize: 11, fontWeight: 600,
+                            color: "rgba(255,255,255,0.5)", fontFamily: "system-ui"
+                        }}>
+                            Jersey #
+                        </span>
+                        <input type="number" min={1} max={99}
+                            value={jerseyNumber}
+                            onChange={e => setJerseyNumber(e.target.value)}
+                            placeholder="—"
+                            style={{
+                                width: 56, background: "rgba(255,255,255,0.06)",
+                                border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8,
+                                padding: "7px 10px", color: "#fff", fontSize: 14,
+                                fontWeight: 700, fontFamily: "system-ui",
+                                textAlign: "center", outline: "none"
+                            }} />
+                    </div>
+                </div>
+
+                {/* Category Summary */}
                 <div style={{
                     padding: "12px 24px 8px", display: "flex",
                     flexWrap: "wrap", gap: 8,
@@ -133,6 +188,7 @@ export default function Modal({ player, onSave, onClose, isNew }) {
                     ))}
                 </div>
 
+                {/* Attribute Sliders */}
                 <div style={{
                     padding: "16px 24px 20px", display: "grid",
                     gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))",
@@ -155,16 +211,14 @@ export default function Modal({ player, onSave, onClose, isNew }) {
                                     {Math.round(cats[c])}
                                 </span>
                             </div>
-                            {
-                                groups[c].map(a => (
-                                    <AttrSlider key={a.key} attr={a} value={attrs[a.key]}
-                                        onChange={v => setAttr(a.key, v)} />
-                                ))
-                            }
+                            {groups[c].map(a => (
+                                <AttrSlider key={a.key} attr={a} value={attrs[a.key]}
+                                    onChange={v => setAttr(a.key, v)} />
+                            ))}
                         </div>
                     ))}
                 </div>
             </div>
-        </div >
+        </div>
     )
 }

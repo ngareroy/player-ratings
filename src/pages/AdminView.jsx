@@ -4,6 +4,7 @@ import { subscribePlayers, savePlayer, removePlayer, ADMIN_SECRET } from '../fir
 import { calcOverall, calcCategories, CAT_ORDER, CAT_LABELS } from '../utils'
 import PlayerCard from '../components/PlayerCard'
 import Modal from '../components/Modal'
+import PlayerDetailModal from '../components/PlayerDetailModal'
 
 export default function AdminView() {
     const { secretKey } = useParams()
@@ -12,8 +13,8 @@ export default function AdminView() {
     const [search, setSearch] = useState("")
     const [modal, setModal] = useState(null)
     const [loading, setLoading] = useState(true)
+    const [detailPlayer, setDetailPlayer] = useState(null)
 
-    // If key doesn't match, redirect to public view
     if (secretKey !== ADMIN_SECRET) return <Navigate to="/" replace />
 
     useEffect(() => {
@@ -134,19 +135,28 @@ export default function AdminView() {
                     }}>
                         {sorted.map(p => (
                             <PlayerCard key={p.id} player={p} rank={ranks[p.id]}
-                                isAdmin={true} onEdit={pl => setModal({ isNew: false, player: pl })}
-                                onDelete={handleDelete} />
+                                isAdmin={true}
+                                onEdit={pl => setModal({ isNew: false, player: pl })}
+                                onDelete={handleDelete}
+                                onClick={setDetailPlayer} />
                         ))}
                         {sorted.length === 0 &&
-                            <p style={{ color: "rgba(255,255,255,0.3)" }}>
-                                No learners found.
-                            </p>
+                            <p style={{ color: "rgba(255,255,255,0.3)" }}>No learners found.</p>
                         }
                     </div>
                 )}
             </div>
+
             {modal && <Modal player={modal.player} isNew={modal.isNew}
                 onSave={handleSave} onClose={() => setModal(null)} />}
+
+            {detailPlayer && (
+                <PlayerDetailModal
+                    player={detailPlayer}
+                    rank={ranks[detailPlayer.id]}
+                    onClose={() => setDetailPlayer(null)}
+                />
+            )}
         </div>
     )
 }

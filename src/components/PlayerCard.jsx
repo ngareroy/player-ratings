@@ -4,28 +4,41 @@ import {
     CAT_ORDER, CAT_LABELS
 } from '../utils'
 
-export default function PlayerCard({ player, rank, isAdmin, onEdit, onDelete }) {
+export default function PlayerCard({ player, rank, isAdmin, onEdit, onDelete, onClick }) {
     const cats = calcCategories(player)
     const ovr = calcOverall(player)
 
     return (
-        <div style={{
-            background: "linear-gradient(145deg,#1a1a2e,#16213e,#0f3460)",
-            borderRadius: 14, width: 270, overflow: "hidden",
-            boxShadow: "0 6px 24px rgba(0,0,0,0.4)",
-            border: "1px solid rgba(255,255,255,0.08)",
-            display: "flex", flexDirection: "column", alignItems: "center",
-            position: "relative"
-        }}>
+        <div
+            onClick={() => onClick && onClick(player)}
+            style={{
+                background: "linear-gradient(145deg,#1a1a2e,#16213e,#0f3460)",
+                borderRadius: 14, width: 270, overflow: "hidden",
+                boxShadow: "0 6px 24px rgba(0,0,0,0.4)",
+                border: "1px solid rgba(255,255,255,0.08)",
+                display: "flex", flexDirection: "column", alignItems: "center",
+                position: "relative",
+                cursor: "pointer",
+                transition: "transform 0.2s, box-shadow 0.2s",
+            }}
+            onMouseEnter={e => {
+                e.currentTarget.style.transform = "translateY(-4px)"
+                e.currentTarget.style.boxShadow = "0 12px 36px rgba(0,0,0,0.5)"
+            }}
+            onMouseLeave={e => {
+                e.currentTarget.style.transform = "translateY(0)"
+                e.currentTarget.style.boxShadow = "0 6px 24px rgba(0,0,0,0.4)"
+            }}
+        >
             {isAdmin && (
-                <div style={{ position: "absolute", top: 8, right: 8, display: "flex", gap: 4 }}>
-                    <button onClick={() => onEdit(player)} style={{
+                <div style={{ position: "absolute", top: 8, right: 8, display: "flex", gap: 4, zIndex: 2 }}>
+                    <button onClick={e => { e.stopPropagation(); onEdit(player) }} style={{
                         background: "rgba(255,255,255,0.1)", border: "none",
                         borderRadius: 6, width: 28, height: 28, cursor: "pointer",
                         color: "#fff", fontSize: 13, display: "flex",
                         alignItems: "center", justifyContent: "center"
                     }}>✏️</button>
-                    <button onClick={() => onDelete(player.id)} style={{
+                    <button onClick={e => { e.stopPropagation(); onDelete(player.id) }} style={{
                         background: "rgba(255,60,60,0.15)", border: "none",
                         borderRadius: 6, width: 28, height: 28, cursor: "pointer",
                         color: "#e74c3c", fontSize: 13, display: "flex",
@@ -45,17 +58,33 @@ export default function PlayerCard({ player, rank, isAdmin, onEdit, onDelete }) 
                     fontSize: 21, fontWeight: 800, color: "#fff", fontFamily: "system-ui",
                     boxShadow: "0 2px 8px rgba(0,0,0,0.3)", flexShrink: 0
                 }}>{Math.round(ovr)}</div>
-                <div>
-                    <div style={{
-                        color: "#fff", fontSize: 17, fontWeight: 700,
-                        fontFamily: "system-ui"
-                    }}>{player.name}</div>
-                    <div style={{
-                        color: "rgba(255,255,255,0.35)", fontSize: 10,
-                        fontWeight: 600, fontFamily: "system-ui", letterSpacing: 1.5
-                    }}>
-                        #{rank} OVERALL
+                <div style={{ flex: 1 }}>
+                    <div style={{ color: "#fff", fontSize: 17, fontWeight: 700, fontFamily: "system-ui" }}>
+                        {player.name}
                     </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{
+                            color: "rgba(255,255,255,0.35)", fontSize: 10,
+                            fontWeight: 600, fontFamily: "system-ui", letterSpacing: 1.5
+                        }}>
+                            #{rank} OVERALL
+                        </span>
+                    </div>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+                    {player.playingPosition && (
+                        <span style={{
+                            background: "rgba(46,204,64,0.15)", color: "#2ecc40",
+                            fontSize: 10, fontWeight: 700, padding: "2px 8px",
+                            borderRadius: 4, letterSpacing: 1, fontFamily: "system-ui"
+                        }}>{player.playingPosition}</span>
+                    )}
+                    {player.jerseyNumber && (
+                        <span style={{
+                            color: "rgba(255,255,255,0.5)", fontSize: 10,
+                            fontWeight: 600, fontFamily: "system-ui", letterSpacing: 0.5
+                        }}>#{player.jerseyNumber}</span>
+                    )}
                 </div>
             </div>
 

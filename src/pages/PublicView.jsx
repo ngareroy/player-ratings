@@ -2,12 +2,14 @@ import { useState, useEffect, useMemo } from 'react'
 import { subscribePlayers } from '../firebase'
 import { calcOverall, calcCategories, CAT_ORDER, CAT_LABELS } from '../utils'
 import PlayerCard from '../components/PlayerCard'
+import PlayerDetailModal from '../components/PlayerDetailModal'
 
 export default function PublicView() {
     const [players, setPlayers] = useState([])
     const [sortBy, setSortBy] = useState("total")
     const [search, setSearch] = useState("")
     const [loading, setLoading] = useState(true)
+    const [detailPlayer, setDetailPlayer] = useState(null)
 
     useEffect(() => {
         const unsub = subscribePlayers((data) => {
@@ -96,16 +98,22 @@ export default function PublicView() {
                     }}>
                         {sorted.map(p => (
                             <PlayerCard key={p.id} player={p} rank={ranks[p.id]}
-                                isAdmin={false} />
+                                isAdmin={false} onClick={setDetailPlayer} />
                         ))}
                         {sorted.length === 0 &&
-                            <p style={{ color: "rgba(255,255,255,0.3)" }}>
-                                No learners found.
-                            </p>
+                            <p style={{ color: "rgba(255,255,255,0.3)" }}>No learners found.</p>
                         }
                     </div>
                 )}
             </div>
+
+            {detailPlayer && (
+                <PlayerDetailModal
+                    player={detailPlayer}
+                    rank={ranks[detailPlayer.id]}
+                    onClose={() => setDetailPlayer(null)}
+                />
+            )}
         </div>
     )
 }
