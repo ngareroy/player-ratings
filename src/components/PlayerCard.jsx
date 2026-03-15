@@ -1,5 +1,4 @@
 import RadarChart from './RadarChart'
-import MiniPitch from './MiniPitch'
 import {
     calcCategories, calcOverall, calcBestRating, calcAllPositionRatings,
     calcGkCategory, getRatingColor, getOvrBg, CAT_ORDER, CAT_LABELS
@@ -93,13 +92,8 @@ export default function PlayerCard({ player, rank, isAdmin, onEdit, onDelete, on
                 </div>
             )}
 
-            {/* Mini Pitch + Radar side by side */}
-            <div style={{ display: "flex", gap: 6, padding: "8px 10px 0", alignItems: "center", width: "100%" }}>
-                <MiniPitch positions={positions} posRatings={posRatings} size="card" />
-                <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
-                    <RadarChart cats={cats} size={155} />
-                </div>
-            </div>
+            {/* Radar Chart */}
+            <RadarChart cats={cats} size={195} />
 
             {/* Category Scores */}
             <div style={{ width: "100%", padding: "0 14px 4px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "4px 8px" }}>

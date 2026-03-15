@@ -78,11 +78,10 @@ export default function PlayerDetailModal({ player, rank, onClose }) {
                     </div>
                 )}
 
-                {/* Mini Pitch + Radar + Categories */}
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", flexWrap: "wrap", padding: "16px 20px 0", gap: 12 }}>
-                    <MiniPitch positions={positions} posRatings={posRatings} size="detail" />
+                {/* Radar + Category Stats (big, like before) */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", flexWrap: "wrap", padding: "12px 20px 0", gap: 8 }}>
                     <div style={{ flexShrink: 0 }}>
-                        <RadarChart cats={cats} size={200} />
+                        <RadarChart cats={cats} size={220} />
                     </div>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 14px", padding: "8px 0" }}>
                         {CAT_ORDER.map((c, i) => (
@@ -105,6 +104,36 @@ export default function PlayerDetailModal({ player, rank, onClose }) {
                         )}
                     </div>
                 </div>
+
+                {/* Mini Pitch — small, between stats and attributes */}
+                {positions.length > 0 && (
+                    <div style={{ padding: "12px 28px 8px", borderTop: "1px solid rgba(255,255,255,0.04)", marginTop: 8, display: "flex", alignItems: "center", gap: 16 }}>
+                        <MiniPitch positions={positions} posRatings={posRatings} size="card" />
+                        <div>
+                            <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: 1.5, marginBottom: 6 }}>PITCH MAP</div>
+                            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                                {positions.map(p => {
+                                    const pr = posRatings.find(r => r.pos === p)
+                                    const rating = pr ? pr.rating : 50
+                                    return (
+                                        <div key={p} style={{
+                                            display: "flex", alignItems: "center", gap: 4,
+                                            background: "rgba(255,255,255,0.03)", borderRadius: 6, padding: "4px 8px"
+                                        }}>
+                                            <span style={{
+                                                width: 8, height: 8, borderRadius: "50%", flexShrink: 0,
+                                                background: p === "GK" ? "#ffaa00" : getRatingColor(rating),
+                                                boxShadow: `0 0 4px ${p === "GK" ? "rgba(255,170,0,0.4)" : getRatingColor(rating) + "44"}`
+                                            }} />
+                                            <span style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.5)", letterSpacing: 0.5 }}>{p}</span>
+                                            <span style={{ fontSize: 11, fontWeight: 800, color: p === "GK" ? "#ffaa00" : getRatingColor(rating) }}>{Math.round(rating)}</span>
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* All Attributes by Category */}
                 <div style={{ padding: "16px 24px 24px" }}>
