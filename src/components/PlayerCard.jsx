@@ -1,4 +1,5 @@
 import RadarChart from './RadarChart'
+import MiniPitch from './MiniPitch'
 import {
     calcCategories, calcOverall, calcBestRating, calcAllPositionRatings,
     calcGkCategory, getRatingColor, getOvrBg, CAT_ORDER, CAT_LABELS
@@ -10,8 +11,11 @@ export default function PlayerCard({ player, rank, isAdmin, onEdit, onDelete, on
     const posRatings = calcAllPositionRatings(player)
     const bestRating = positions.length > 0 ? calcBestRating(player) : calcOverall(player)
     const hasGK = positions.includes("GK")
+    const hasOutfield = positions.some(p => p !== "GK")
     const gkScore = hasGK ? calcGkCategory(player) : null
-    const jerseyNumbers = player.jerseyNumbers || {}
+    const jerseyNumber = player.jerseyNumber || ""
+    const gkJerseyNumber = player.gkJerseyNumber || ""
+    const needsTwoJerseys = hasGK && hasOutfield
 
     return (
         <div onClick={() => onClick && onClick(player)}
@@ -66,17 +70,36 @@ export default function PlayerCard({ player, rank, isAdmin, onEdit, onDelete, on
             </div>
 
             {/* Jersey Numbers */}
-            {positions.length > 0 && Object.values(jerseyNumbers).some(v => v) && (
-                <div style={{ width: "100%", padding: "4px 16px 0", display: "flex", gap: 8, flexWrap: "wrap" }}>
-                    {positions.map(p => jerseyNumbers[p] ? (
-                        <span key={p} style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", fontFamily: "system-ui" }}>
-                            Jersey <span style={{ fontWeight: 700, color: "rgba(255,255,255,0.6)" }}>#{jerseyNumbers[p]}</span> ({p})
+            {(jerseyNumber || gkJerseyNumber) && (
+                <div style={{ width: "100%", padding: "4px 16px 0", display: "flex", gap: 10, flexWrap: "wrap" }}>
+                    {needsTwoJerseys ? (
+                        <>
+                            {jerseyNumber && (
+                                <span style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", fontFamily: "system-ui" }}>
+                                    Jersey <span style={{ fontWeight: 700, color: "rgba(255,255,255,0.6)" }}>#{jerseyNumber}</span>
+                                </span>
+                            )}
+                            {gkJerseyNumber && (
+                                <span style={{ fontSize: 9, color: "rgba(255,170,0,0.5)", fontFamily: "system-ui" }}>
+                                    Jersey <span style={{ fontWeight: 700, color: "rgba(255,170,0,0.7)" }}>#{gkJerseyNumber}</span> (GK)
+                                </span>
+                            )}
+                        </>
+                    ) : (
+                        <span style={{ fontSize: 9, color: hasGK ? "rgba(255,170,0,0.5)" : "rgba(255,255,255,0.4)", fontFamily: "system-ui" }}>
+                            Jersey <span style={{ fontWeight: 700, color: hasGK ? "rgba(255,170,0,0.7)" : "rgba(255,255,255,0.6)" }}>#{jerseyNumber || gkJerseyNumber}</span>
                         </span>
-                    ) : null)}
+                    )}
                 </div>
             )}
 
-            <RadarChart cats={cats} size={195} />
+            {/* Mini Pitch + Radar side by side */}
+            <div style={{ display: "flex", gap: 6, padding: "8px 10px 0", alignItems: "center", width: "100%" }}>
+                <MiniPitch positions={positions} posRatings={posRatings} size="card" />
+                <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
+                    <RadarChart cats={cats} size={155} />
+                </div>
+            </div>
 
             {/* Category Scores */}
             <div style={{ width: "100%", padding: "0 14px 4px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "4px 8px" }}>

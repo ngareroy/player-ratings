@@ -125,8 +125,8 @@ export function getAllUsedJerseyNumbers(players, excludePlayerId) {
     const used = new Set()
     players.forEach(p => {
         if (p.id === excludePlayerId) return
-        const jn = p.jerseyNumbers || {}
-        Object.values(jn).forEach(n => { if (n) used.add(String(n)) })
+        if (p.jerseyNumber) used.add(String(p.jerseyNumber))
+        if (p.gkJerseyNumber) used.add(String(p.gkJerseyNumber))
     })
     return used
 }

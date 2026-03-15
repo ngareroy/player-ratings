@@ -29,7 +29,8 @@ function AttrSlider({ attr, value, onChange, disabled }) {
 export default function Modal({ player, onSave, onClose, isNew, allPlayers }) {
     const [name, setName] = useState(player?.name || "")
     const [positions, setPositions] = useState(player?.positions || [])
-    const [jerseyNumbers, setJerseyNumbers] = useState(player?.jerseyNumbers || {})
+    const [jerseyNumber, setJerseyNumber] = useState(player?.jerseyNumber || "")
+    const [gkJerseyNumber, setGkJerseyNumber] = useState(player?.gkJerseyNumber || "")
     const [error, setError] = useState("")
     const [attrs, setAttrs] = useState(() => {
         const a = {}
@@ -40,6 +41,8 @@ export default function Modal({ player, onSave, onClose, isNew, allPlayers }) {
     const setAttr = (k, v) => setAttrs(prev => ({ ...prev, [k]: v }))
 
     const hasGK = positions.includes("GK")
+    const hasOutfield = positions.some(p => p !== "GK")
+    const needsTwoJerseys = hasGK && hasOutfield
     const cats = calcCategories(attrs)
     const gkCat = calcGkCategory(attrs)
     const posRatings = calcAllPositionRatings({ ...attrs, positions })
@@ -50,47 +53,64 @@ export default function Modal({ player, onSave, onClose, isNew, allPlayers }) {
     const togglePosition = (pos) => {
         setPositions(prev => {
             const next = prev.includes(pos) ? prev.filter(p => p !== pos) : [...prev, pos]
-            if (!next.includes(pos)) {
-                const jn = { ...jerseyNumbers }
-                delete jn[pos]
-                setJerseyNumbers(jn)
-            }
             return next
         })
         setError("")
     }
 
-    const setJersey = (pos, val) => {
-        setJerseyNumbers(prev => ({ ...prev, [pos]: val }))
-        setError("")
-    }
-
     const handleSave = () => {
         if (!name.trim()) return
-        // Validate jersey uniqueness
-        const myNumbers = Object.entries(jerseyNumbers).filter(([p]) => positions.includes(p))
-        const myVals = myNumbers.map(([, v]) => String(v)).filter(v => v)
-        // Check duplicates within this player
-        const mySet = new Set()
-        for (const v of myVals) {
-            if (mySet.has(v)) { setError("Same jersey number used twice for this player."); return }
-            mySet.add(v)
+
+        // Collect all jersey numbers this player is using
+        const myNumbers = []
+        if (needsTwoJerseys) {
+            if (jerseyNumber) myNumbers.push(String(jerseyNumber))
+            if (gkJerseyNumber) myNumbers.push(String(gkJerseyNumber))
+            // Check if both are the same
+            if (jerseyNumber && gkJerseyNumber && String(jerseyNumber) === String(gkJerseyNumber)) {
+                setError("Outfield and GK jersey numbers must be different.")
+                return
+            }
+        } else {
+            // Single jersey — use jerseyNumber for outfield-only or GK-only
+            const singleNum = hasGK ? (gkJerseyNumber || jerseyNumber) : jerseyNumber
+            if (singleNum) myNumbers.push(String(singleNum))
         }
+
         // Check against other players
-        for (const v of myVals) {
-            if (usedJerseys.has(v)) { setError("Jersey #" + v + " is already taken by another player."); return }
+        for (const v of myNumbers) {
+            if (usedJerseys.has(v)) {
+                setError("Jersey #" + v + " is already taken by another player.")
+                return
+            }
         }
-        const cleanJerseys = {}
-        positions.forEach(p => { if (jerseyNumbers[p]) cleanJerseys[p] = String(jerseyNumbers[p]) })
+
         const gkAttrs = {}
-        if (positions.includes("GK")) {
+        if (hasGK) {
             GK_ATTRS.forEach(a => gkAttrs[a.key] = attrs[a.key])
         } else {
             GK_ATTRS.forEach(a => gkAttrs[a.key] = 0)
         }
+
+        // Normalize jersey storage
+        let saveJersey = ""
+        let saveGkJersey = ""
+        if (needsTwoJerseys) {
+            saveJersey = jerseyNumber ? String(jerseyNumber) : ""
+            saveGkJersey = gkJerseyNumber ? String(gkJerseyNumber) : ""
+        } else if (hasGK) {
+            saveGkJersey = (gkJerseyNumber || jerseyNumber) ? String(gkJerseyNumber || jerseyNumber) : ""
+            saveJersey = ""
+        } else {
+            saveJersey = jerseyNumber ? String(jerseyNumber) : ""
+            saveGkJersey = ""
+        }
+
         onSave({
             ...player, ...attrs, ...gkAttrs,
-            name: name.trim(), positions, jerseyNumbers: cleanJerseys,
+            name: name.trim(), positions,
+            jerseyNumber: saveJersey,
+            gkJerseyNumber: saveGkJersey,
             id: player?.id || Date.now().toString()
         })
     }
@@ -146,17 +166,44 @@ export default function Modal({ player, onSave, onClose, isNew, allPlayers }) {
                     ))}
                 </div>
 
-                {/* Jersey Numbers per Position */}
+                {/* Jersey Numbers */}
                 {positions.length > 0 && (
-                    <div style={{ padding: "12px 24px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center" }}>
-                        {positions.map(pos => (
-                            <div key={pos} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                                <span style={{ fontSize: 10, fontWeight: 600, color: pos === "GK" ? "rgba(255,170,0,0.7)" : "rgba(255,255,255,0.5)" }}>Jersey ({pos})</span>
-                                <input type="number" min={1} max={99} value={jerseyNumbers[pos] || ""}
-                                    onChange={e => setJersey(pos, e.target.value)} placeholder="—"
-                                    style={{ width: 52, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8, padding: "6px 8px", color: "#fff", fontSize: 14, fontWeight: 700, textAlign: "center", outline: "none" }} />
+                    <div style={{ padding: "12px 24px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center" }}>
+                        {/* Single jersey for outfield-only or GK-only */}
+                        {!needsTwoJerseys && (
+                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                <span style={{ fontSize: 11, fontWeight: 600, color: hasGK ? "rgba(255,170,0,0.7)" : "rgba(255,255,255,0.5)" }}>Jersey</span>
+                                <input type="number" min={1} max={99}
+                                    value={hasGK ? (gkJerseyNumber || jerseyNumber) : jerseyNumber}
+                                    onChange={e => {
+                                        if (hasGK) setGkJerseyNumber(e.target.value)
+                                        else setJerseyNumber(e.target.value)
+                                        setError("")
+                                    }}
+                                    placeholder="—"
+                                    style={{ width: 56, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8, padding: "7px 10px", color: "#fff", fontSize: 14, fontWeight: 700, textAlign: "center", outline: "none" }} />
                             </div>
-                        ))}
+                        )}
+
+                        {/* Two jerseys when GK + outfield */}
+                        {needsTwoJerseys && (
+                            <>
+                                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                    <span style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.5)" }}>Jersey (Outfield)</span>
+                                    <input type="number" min={1} max={99} value={jerseyNumber}
+                                        onChange={e => { setJerseyNumber(e.target.value); setError("") }}
+                                        placeholder="—"
+                                        style={{ width: 56, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8, padding: "7px 10px", color: "#fff", fontSize: 14, fontWeight: 700, textAlign: "center", outline: "none" }} />
+                                </div>
+                                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                    <span style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,170,0,0.7)" }}>Jersey (GK)</span>
+                                    <input type="number" min={1} max={99} value={gkJerseyNumber}
+                                        onChange={e => { setGkJerseyNumber(e.target.value); setError("") }}
+                                        placeholder="—"
+                                        style={{ width: 56, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,170,0,0.2)", borderRadius: 8, padding: "7px 10px", color: "#ffaa00", fontSize: 14, fontWeight: 700, textAlign: "center", outline: "none" }} />
+                                </div>
+                            </>
+                        )}
                     </div>
                 )}
 

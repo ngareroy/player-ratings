@@ -1,4 +1,5 @@
 import RadarChart from './RadarChart'
+import MiniPitch from './MiniPitch'
 import {
     ATTRS, GK_ATTRS, CAT_ORDER, CAT_FORMULAS, CAT_LABELS,
     calcCategories, calcGkCategory, calcBestRating, calcOverall,
@@ -11,8 +12,11 @@ export default function PlayerDetailModal({ player, rank, onClose }) {
     const posRatings = calcAllPositionRatings(player)
     const bestRating = positions.length > 0 ? calcBestRating(player) : calcOverall(player)
     const hasGK = positions.includes("GK")
+    const hasOutfield = positions.some(p => p !== "GK")
     const gkScore = hasGK ? calcGkCategory(player) : null
-    const jerseyNumbers = player.jerseyNumbers || {}
+    const needsTwoJerseys = hasGK && hasOutfield
+    const jerseyNumber = player.jerseyNumber || ""
+    const gkJerseyNumber = player.gkJerseyNumber || ""
 
     const groups = { tec: [], pas: [], att: [], phy: [], def: [], ment: [] }
     ATTRS.forEach(a => groups[a.cat].push(a))
@@ -35,14 +39,26 @@ export default function PlayerDetailModal({ player, rank, onClose }) {
                                     <span key={p} style={{ background: p === "GK" ? "rgba(255,170,0,0.15)" : "rgba(46,204,64,0.15)", color: p === "GK" ? "#ffaa00" : "#2ecc40", fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 6, letterSpacing: 1 }}>{p}</span>
                                 ))}
                             </div>
-                            {/* Jersey Numbers */}
-                            {positions.length > 0 && Object.values(jerseyNumbers).some(v => v) && (
-                                <div style={{ display: "flex", gap: 10, marginTop: 6, flexWrap: "wrap" }}>
-                                    {positions.map(p => jerseyNumbers[p] ? (
-                                        <span key={p} style={{ fontSize: 11, color: "rgba(255,255,255,0.45)" }}>
-                                            Jersey <span style={{ fontWeight: 700, color: "rgba(255,255,255,0.7)" }}>#{jerseyNumbers[p]}</span> ({p})
+                            {(jerseyNumber || gkJerseyNumber) && (
+                                <div style={{ display: "flex", gap: 12, marginTop: 6, flexWrap: "wrap" }}>
+                                    {needsTwoJerseys ? (
+                                        <>
+                                            {jerseyNumber && (
+                                                <span style={{ fontSize: 12, color: "rgba(255,255,255,0.45)" }}>
+                                                    Jersey <span style={{ fontWeight: 700, color: "rgba(255,255,255,0.7)" }}>#{jerseyNumber}</span>
+                                                </span>
+                                            )}
+                                            {gkJerseyNumber && (
+                                                <span style={{ fontSize: 12, color: "rgba(255,170,0,0.6)" }}>
+                                                    Jersey <span style={{ fontWeight: 700, color: "rgba(255,170,0,0.8)" }}>#{gkJerseyNumber}</span> (GK)
+                                                </span>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <span style={{ fontSize: 12, color: hasGK ? "rgba(255,170,0,0.6)" : "rgba(255,255,255,0.45)" }}>
+                                            Jersey <span style={{ fontWeight: 700, color: hasGK ? "rgba(255,170,0,0.8)" : "rgba(255,255,255,0.7)" }}>#{jerseyNumber || gkJerseyNumber}</span>
                                         </span>
-                                    ) : null)}
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -51,8 +67,8 @@ export default function PlayerDetailModal({ player, rank, onClose }) {
 
                 {/* Position Ratings */}
                 {posRatings.length > 0 && (
-                    <div style={{ padding: "14px 28px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", gap: 10, flexWrap: "wrap" }}>
-                        <span style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: 1.5, alignSelf: "center" }}>POSITION RATINGS</span>
+                    <div style={{ padding: "14px 28px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+                        <span style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: 1.5 }}>POSITION RATINGS</span>
                         {posRatings.map(pr => (
                             <div key={pr.pos} style={{ background: "rgba(255,255,255,0.04)", borderRadius: 10, padding: "8px 14px", display: "flex", alignItems: "center", gap: 6 }}>
                                 <span style={{ fontSize: 20, fontWeight: 800, color: getRatingColor(pr.rating), fontFamily: "system-ui" }}>{Math.round(pr.rating)}</span>
@@ -62,10 +78,11 @@ export default function PlayerDetailModal({ player, rank, onClose }) {
                     </div>
                 )}
 
-                {/* Radar + Categories */}
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", flexWrap: "wrap", padding: "12px 20px 0", gap: 8 }}>
+                {/* Mini Pitch + Radar + Categories */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", flexWrap: "wrap", padding: "16px 20px 0", gap: 12 }}>
+                    <MiniPitch positions={positions} posRatings={posRatings} size="detail" />
                     <div style={{ flexShrink: 0 }}>
-                        <RadarChart cats={cats} size={220} />
+                        <RadarChart cats={cats} size={200} />
                     </div>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 14px", padding: "8px 0" }}>
                         {CAT_ORDER.map((c, i) => (
@@ -113,8 +130,6 @@ export default function PlayerDetailModal({ player, rank, onClose }) {
                                 })}
                             </div>
                         ))}
-
-                        {/* GK Attributes */}
                         {hasGK && (
                             <div style={{ background: "rgba(255,170,0,0.03)", borderRadius: 12, padding: "14px 16px", border: "1px solid rgba(255,170,0,0.08)" }}>
                                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
