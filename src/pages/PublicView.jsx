@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { subscribePlayers, subscribeTeams } from '../firebase'
+import { subscribePlayers, subscribeTeams, subscribeClubSettings } from '../firebase'
 import { calcBestRating, calcOverall, calcCategories, CAT_ORDER, CAT_LABELS } from '../utils'
 import PlayerCard from '../components/PlayerCard'
 import PlayerDetailModal from '../components/PlayerDetailModal'
@@ -11,6 +11,7 @@ export default function PublicView() {
     const [search, setSearch] = useState("")
     const [filterTeam, setFilterTeam] = useState("all")
     const [teams, setTeams] = useState([])
+    const [club, setClub] = useState({ clubName: "Hub FC", logoEmoji: "⚽" })
     const [loading, setLoading] = useState(true)
     const [detailPlayer, setDetailPlayer] = useState(null)
 
@@ -20,7 +21,8 @@ export default function PublicView() {
             setLoading(false)
         })
         const unsub2 = subscribeTeams(setTeams)
-        return () => { unsub(); unsub2() }
+        const unsub3 = subscribeClubSettings(setClub)
+        return () => { unsub(); unsub2(); unsub3() }
     }, [])
 
     const enriched = useMemo(() =>
@@ -65,6 +67,9 @@ export default function PublicView() {
         <div style={{ minHeight: "100vh", background: "#0a0a1a", padding: "20px 12px", fontFamily: "system-ui" }}>
             <div style={{ maxWidth: 1280, margin: "0 auto" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "center", position: "relative", marginBottom: 2 }}>
+                    <button onClick={() => navigate('/')} style={{ position: "absolute", left: 0, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "6px 14px", color: "rgba(255,255,255,0.25)", fontSize: 10, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
+                        <span style={{ fontSize: 14 }}>{club.logoEmoji || "⚽"}</span> Home
+                    </button>
                     <h1 style={{ color: "#fff", fontSize: 26, fontWeight: 800, textAlign: "center", margin: 0, letterSpacing: 1 }}>PLAYER RATINGS</h1>
                     <button onClick={() => navigate('/login')}
                         style={{ position: "absolute", right: 0, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "6px 14px", color: "rgba(255,255,255,0.25)", fontSize: 10, fontWeight: 600, cursor: "pointer", letterSpacing: 0.5 }}>

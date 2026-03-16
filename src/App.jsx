@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './contexts/AuthContext'
+import HomePage from './pages/HomePage'
 import PublicView from './pages/PublicView'
 import AdminView from './pages/AdminView'
 import LoginPage from './pages/LoginPage'
@@ -8,6 +9,8 @@ import TeamManager from './pages/TeamManager'
 import AssessmentManager from './pages/AssessmentManager'
 import MatchCenter from './pages/MatchCenter'
 import MatchDetail from './pages/MatchDetail'
+import ClubSettings from './pages/ClubSettings'
+import NewsDetail from './pages/NewsDetail'
 
 function ProtectedRoute({ children, requireHeadCoach }) {
     const { user, isAdmin, isHeadCoach, loading } = useAuth()
@@ -34,7 +37,9 @@ function ProtectedRoute({ children, requireHeadCoach }) {
 export default function App() {
     return (
         <Routes>
-            <Route path="/" element={<PublicView />} />
+            <Route path="/" element={<HomePage />} />
+            <Route path="/players" element={<PublicView />} />
+            <Route path="/news/:postId" element={<NewsDetail />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/admin" element={
                 <ProtectedRoute>
@@ -64,6 +69,11 @@ export default function App() {
             <Route path="/admin/matches/:matchId" element={
                 <ProtectedRoute>
                     <MatchDetail />
+                </ProtectedRoute>
+            } />
+            <Route path="/admin/club" element={
+                <ProtectedRoute requireHeadCoach>
+                    <ClubSettings />
                 </ProtectedRoute>
             } />
             <Route path="/admin/:secretKey" element={<Navigate to="/login" replace />} />

@@ -134,6 +134,44 @@ export function subscribeSeasons(callback) {
     })
 }
 
+// ============ CLUB SETTINGS ============
+
+export async function getClubSettings() {
+    const snap = await getDoc(doc(db, 'clubSettings', 'main'))
+    if (snap.exists()) return snap.data()
+    return { clubName: "Hub FC", motto: "", about: "", primaryColor: "#2ecc40", logoEmoji: "⚽" }
+}
+
+export async function saveClubSettings(settings) {
+    await setDoc(doc(db, 'clubSettings', 'main'), settings)
+}
+
+export function subscribeClubSettings(callback) {
+    return onSnapshot(doc(db, 'clubSettings', 'main'), (snap) => {
+        if (snap.exists()) callback(snap.data())
+        else callback({ clubName: "Hub FC", motto: "", about: "", primaryColor: "#2ecc40", logoEmoji: "⚽" })
+    })
+}
+
+// ============ NEWS ============
+
+const newsRef = collection(db, 'news')
+
+export async function saveNewsPost(post) {
+    await setDoc(doc(db, 'news', post.id), post)
+}
+
+export async function removeNewsPost(id) {
+    await deleteDoc(doc(db, 'news', id))
+}
+
+export function subscribeNews(callback) {
+    return onSnapshot(newsRef, (snapshot) => {
+        const list = snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
+        callback(list)
+    })
+}
+
 // ============ MATCHES ============
 
 const matchesRef = collection(db, 'matches')
