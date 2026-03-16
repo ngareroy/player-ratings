@@ -59,6 +59,12 @@ export default function PlayerCard({ player, rank, isAdmin, onEdit, onDelete, on
                     <div style={{ color: "#fff", fontSize: 16, fontWeight: 700, fontFamily: "system-ui" }}>{player.name}</div>
                     <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", marginTop: 2 }}>
                         <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 9, fontWeight: 600, letterSpacing: 1.5 }}>#{rank}</span>
+                        {teamName && (
+                            <span style={{
+                                background: "rgba(52,152,219,0.12)", color: "#3498db",
+                                fontSize: 9, fontWeight: 700, padding: "1px 6px", borderRadius: 4, letterSpacing: 0.5
+                            }}>{teamName}</span>
+                        )}
                         {positions.map(p => (
                             <span key={p} style={{
                                 background: p === "GK" ? "rgba(255,170,0,0.15)" : "rgba(46,204,64,0.15)",

@@ -55,6 +55,12 @@ export default function AdminView() {
         return list
     }, [enriched, sortBy, search, filterTeam])
 
+    const teamMap = useMemo(() => {
+        const m = {}
+        teams.forEach(t => m[t.id] = t.name)
+        return m
+    }, [teams])
+
     const handleSave = useCallback(async (p) => {
         await savePlayer(p)
         setModal(null)
@@ -170,6 +176,7 @@ export default function AdminView() {
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 18, justifyContent: "center" }}>
                         {sorted.map(p => (
                             <PlayerCard key={p.id} player={p} rank={ranks[p.id]} isAdmin={true}
+                                teamName={teamMap[p.teamId] || ""}
                                 onEdit={pl => setModal({ isNew: false, player: pl })}
                                 onDelete={isHeadCoach ? handleDelete : null}
                                 onClick={setDetailPlayer} />
@@ -184,6 +191,7 @@ export default function AdminView() {
 
             {detailPlayer && (
                 <PlayerDetailModal player={detailPlayer} rank={ranks[detailPlayer.id]}
+                    teamName={teamMap[detailPlayer.teamId] || ""}
                     onClose={() => setDetailPlayer(null)} />
             )}
 

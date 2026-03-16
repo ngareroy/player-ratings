@@ -48,6 +48,12 @@ export default function PublicView() {
         return list
     }, [enriched, sortBy, search, filterTeam])
 
+    const teamMap = useMemo(() => {
+        const m = {}
+        teams.forEach(t => m[t.id] = t.name)
+        return m
+    }, [teams])
+
     const navigate = useNavigate()
 
     return (
@@ -99,7 +105,9 @@ export default function PublicView() {
                 ) : (
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 18, justifyContent: "center" }}>
                         {sorted.map(p => (
-                            <PlayerCard key={p.id} player={p} rank={ranks[p.id]} isAdmin={false} onClick={setDetailPlayer} />
+                            <PlayerCard key={p.id} player={p} rank={ranks[p.id]} isAdmin={false}
+                                teamName={teamMap[p.teamId] || ""}
+                                onClick={setDetailPlayer} />
                         ))}
                         {sorted.length === 0 && <p style={{ color: "rgba(255,255,255,0.3)" }}>No learners found.</p>}
                     </div>
@@ -107,7 +115,12 @@ export default function PublicView() {
             </div>
 
             {detailPlayer && (
-                <PlayerDetailModal player={detailPlayer} rank={ranks[detailPlayer.id]} onClose={() => setDetailPlayer(null)} />
+                <PlayerDetailModal
+                    player={detailPlayer}
+                    rank={ranks[detailPlayer.id]}
+                    teamName={teamMap[detailPlayer.teamId] || ""}
+                    onClose={() => setDetailPlayer(null)}
+                />
             )}
         </div>
     )

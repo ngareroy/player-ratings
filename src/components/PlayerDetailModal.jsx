@@ -6,7 +6,7 @@ import {
     calcAllPositionRatings, getRatingColor, getOvrBg
 } from '../utils'
 
-export default function PlayerDetailModal({ player, rank, onClose }) {
+export default function PlayerDetailModal({ player, rank, onClose, teamName }) {
     const cats = calcCategories(player)
     const positions = player.positions || []
     const posRatings = calcAllPositionRatings(player)
@@ -35,6 +35,9 @@ export default function PlayerDetailModal({ player, rank, onClose }) {
                             <div style={{ color: "#fff", fontSize: 26, fontWeight: 800, fontFamily: "system-ui" }}>{player.name}</div>
                             <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 4, flexWrap: "wrap" }}>
                                 <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, fontWeight: 600, letterSpacing: 1.5 }}>#{rank}</span>
+                                {teamName && (
+                                    <span style={{ background: "rgba(52,152,219,0.12)", color: "#3498db", fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 6, letterSpacing: 0.5 }}>{teamName}</span>
+                                )}
                                 {positions.map(p => (
                                     <span key={p} style={{ background: p === "GK" ? "rgba(255,170,0,0.15)" : "rgba(46,204,64,0.15)", color: p === "GK" ? "#ffaa00" : "#2ecc40", fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 6, letterSpacing: 1 }}>{p}</span>
                                 ))}
