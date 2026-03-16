@@ -3,6 +3,7 @@ import {
     ATTRS, GK_ATTRS, CAT_ORDER, CAT_FORMULAS, POS_GROUPS,
     calcCategories, calcGkCategory, calcBestRating, calcOverall,
     calcAllPositionRatings, getAllUsedJerseyNumbers,
+    calcAge, suggestTeam,
     getRatingColor, getOvrBg
 } from '../utils'
 import { subscribeTeams } from '../firebase'
@@ -29,7 +30,9 @@ function AttrSlider({ attr, value, onChange, disabled }) {
 
 export default function Modal({ player, onSave, onClose, isNew, allPlayers }) {
     const [name, setName] = useState(player?.name || "")
+    const [dob, setDob] = useState(player?.dob || "")
     const [teamId, setTeamId] = useState(player?.teamId || "")
+    const [teamAutoSet, setTeamAutoSet] = useState(false)
     const [teams, setTeams] = useState([])
     const [positions, setPositions] = useState(player?.positions || [])
     const [jerseyNumber, setJerseyNumber] = useState(player?.jerseyNumber || "")
@@ -48,6 +51,18 @@ export default function Modal({ player, onSave, onClose, isNew, allPlayers }) {
         return () => unsub()
     }, [])
 
+    // Auto-assign team when DOB changes (only if not manually set)
+    useEffect(() => {
+        if (dob && teams.length > 0 && (isNew || !player?.teamId || teamAutoSet)) {
+            const suggested = suggestTeam(dob, teams)
+            if (suggested) {
+                setTeamId(suggested)
+                setTeamAutoSet(true)
+            }
+        }
+    }, [dob, teams])
+
+    const age = calcAge(dob)
     const hasGK = positions.includes("GK")
     const hasOutfield = positions.some(p => p !== "GK")
     const needsTwoJerseys = hasGK && hasOutfield
@@ -116,7 +131,7 @@ export default function Modal({ player, onSave, onClose, isNew, allPlayers }) {
 
         onSave({
             ...player, ...attrs, ...gkAttrs,
-            name: name.trim(), positions, teamId,
+            name: name.trim(), positions, teamId, dob,
             jerseyNumber: saveJersey,
             gkJerseyNumber: saveGkJersey,
             id: player?.id || Date.now().toString()
@@ -138,6 +153,15 @@ export default function Modal({ player, onSave, onClose, isNew, allPlayers }) {
                             <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 600, letterSpacing: 1, marginBottom: 4 }}>{isNew ? "ADD NEW LEARNER" : "EDIT LEARNER"}</div>
                             <input value={name} onChange={e => setName(e.target.value)} placeholder="Player name..."
                                 style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: 8, padding: "8px 12px", color: "#fff", fontSize: 16, fontWeight: 700, fontFamily: "system-ui", outline: "none", width: 200 }} />
+                            <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6 }}>
+                                <input type="date" value={dob} onChange={e => setDob(e.target.value)}
+                                    style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 6, padding: "5px 10px", color: "#fff", fontSize: 11, outline: "none", colorScheme: "dark" }} />
+                                {age !== null && (
+                                    <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 11, fontWeight: 600 }}>
+                                        Age: <span style={{ color: "#fff" }}>{age}</span>
+                                    </span>
+                                )}
+                            </div>
                         </div>
                     </div>
                     <div style={{ display: "flex", gap: 8 }}>
@@ -153,9 +177,14 @@ export default function Modal({ player, onSave, onClose, isNew, allPlayers }) {
 
                 {/* Team Assignment */}
                 <div style={{ padding: "14px 24px 10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                    <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, letterSpacing: 1.5, display: "block", marginBottom: 8 }}>TEAM</label>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                        <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, letterSpacing: 1.5 }}>TEAM</label>
+                        {teamAutoSet && age !== null && (
+                            <span style={{ fontSize: 9, color: "rgba(52,152,219,0.7)", fontStyle: "italic" }}>auto-assigned by age ({age})</span>
+                        )}
+                    </div>
                     <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                        <button onClick={() => setTeamId("")}
+                        <button onClick={() => { setTeamId(""); setTeamAutoSet(false) }}
                             style={{
                                 background: !teamId ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.04)",
                                 border: !teamId ? "1px solid rgba(255,255,255,0.25)" : "1px solid rgba(255,255,255,0.1)",
@@ -164,7 +193,7 @@ export default function Modal({ player, onSave, onClose, isNew, allPlayers }) {
                                 fontSize: 11, fontWeight: 600, cursor: "pointer"
                             }}>Unassigned</button>
                         {teams.map(t => (
-                            <button key={t.id} onClick={() => setTeamId(t.id)}
+                            <button key={t.id} onClick={() => { setTeamId(t.id); setTeamAutoSet(false) }}
                                 style={{
                                     background: teamId === t.id ? "rgba(52,152,219,0.2)" : "rgba(255,255,255,0.04)",
                                     border: teamId === t.id ? "1px solid #3498db" : "1px solid rgba(255,255,255,0.1)",

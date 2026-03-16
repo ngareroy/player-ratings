@@ -1,7 +1,7 @@
 import RadarChart from './RadarChart'
 import {
     calcCategories, calcOverall, calcBestRating, calcAllPositionRatings,
-    calcGkCategory, getRatingColor, getOvrBg, CAT_ORDER, CAT_LABELS
+    calcGkCategory, calcAge, getRatingColor, getOvrBg, CAT_ORDER, CAT_LABELS
 } from '../utils'
 
 export default function PlayerCard({ player, rank, isAdmin, onEdit, onDelete, onClick, teamName }) {
@@ -15,6 +15,7 @@ export default function PlayerCard({ player, rank, isAdmin, onEdit, onDelete, on
     const jerseyNumber = player.jerseyNumber || ""
     const gkJerseyNumber = player.gkJerseyNumber || ""
     const needsTwoJerseys = hasGK && hasOutfield
+    const age = calcAge(player.dob)
 
     return (
         <div onClick={() => onClick && onClick(player)}
@@ -59,6 +60,9 @@ export default function PlayerCard({ player, rank, isAdmin, onEdit, onDelete, on
                     <div style={{ color: "#fff", fontSize: 16, fontWeight: 700, fontFamily: "system-ui" }}>{player.name}</div>
                     <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", marginTop: 2 }}>
                         <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 9, fontWeight: 600, letterSpacing: 1.5 }}>#{rank}</span>
+                        {age !== null && (
+                            <span style={{ color: "rgba(255,255,255,0.25)", fontSize: 9, fontWeight: 600 }}>Age {age}</span>
+                        )}
                         {teamName && (
                             <span style={{
                                 background: "rgba(52,152,219,0.12)", color: "#3498db",

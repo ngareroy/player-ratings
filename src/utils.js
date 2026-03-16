@@ -131,6 +131,35 @@ export function getAllUsedJerseyNumbers(players, excludePlayerId) {
     return used
 }
 
+export function calcAge(dob) {
+    if (!dob) return null
+    const birth = new Date(dob)
+    const today = new Date()
+    let age = today.getFullYear() - birth.getFullYear()
+    const m = today.getMonth() - birth.getMonth()
+    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--
+    return age
+}
+
+export function suggestTeam(dob, teams) {
+    const age = calcAge(dob)
+    if (age === null || !teams || teams.length === 0) return ""
+    // Find best matching age group team
+    const ageGroups = teams.map(t => {
+        const match = t.ageGroup?.match(/^U(\d+)$/)
+        if (!match) return { team: t, maxAge: 99 }
+        return { team: t, maxAge: parseInt(match[1]) }
+    }).filter(t => t.maxAge !== 99)
+        .sort((a, b) => a.maxAge - b.maxAge)
+    // Find the smallest age group where the player's age fits
+    for (const ag of ageGroups) {
+        if (age < ag.maxAge) return ag.team.id
+    }
+    // If older than all groups, return the largest
+    if (ageGroups.length > 0) return ageGroups[ageGroups.length - 1].team.id
+    return ""
+}
+
 export function getRatingColor(v) {
     if (v >= 80) return "#2ecc40"
     if (v >= 70) return "#7bc74d"

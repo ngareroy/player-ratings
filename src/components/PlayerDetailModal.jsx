@@ -3,7 +3,7 @@ import MiniPitch from './MiniPitch'
 import {
     ATTRS, GK_ATTRS, CAT_ORDER, CAT_FORMULAS, CAT_LABELS,
     calcCategories, calcGkCategory, calcBestRating, calcOverall,
-    calcAllPositionRatings, getRatingColor, getOvrBg
+    calcAllPositionRatings, calcAge, getRatingColor, getOvrBg
 } from '../utils'
 
 export default function PlayerDetailModal({ player, rank, onClose, teamName }) {
@@ -17,6 +17,7 @@ export default function PlayerDetailModal({ player, rank, onClose, teamName }) {
     const needsTwoJerseys = hasGK && hasOutfield
     const jerseyNumber = player.jerseyNumber || ""
     const gkJerseyNumber = player.gkJerseyNumber || ""
+    const age = calcAge(player.dob)
 
     const groups = { tec: [], pas: [], att: [], phy: [], def: [], ment: [] }
     ATTRS.forEach(a => groups[a.cat].push(a))
@@ -35,6 +36,11 @@ export default function PlayerDetailModal({ player, rank, onClose, teamName }) {
                             <div style={{ color: "#fff", fontSize: 26, fontWeight: 800, fontFamily: "system-ui" }}>{player.name}</div>
                             <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 4, flexWrap: "wrap" }}>
                                 <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, fontWeight: 600, letterSpacing: 1.5 }}>#{rank}</span>
+                                {age !== null && (
+                                    <span style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.5)", fontSize: 11, fontWeight: 600, padding: "3px 10px", borderRadius: 6 }}>
+                                        Age {age}
+                                    </span>
+                                )}
                                 {teamName && (
                                     <span style={{ background: "rgba(52,152,219,0.12)", color: "#3498db", fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 6, letterSpacing: 0.5 }}>{teamName}</span>
                                 )}
