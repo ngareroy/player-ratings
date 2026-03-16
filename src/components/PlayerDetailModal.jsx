@@ -1,6 +1,7 @@
 import RadarChart from './RadarChart'
 import MiniPitch from './MiniPitch'
 import ProgressChart from './ProgressChart'
+import PlayerMatchStats from './PlayerMatchStats'
 import {
     ATTRS, GK_ATTRS, CAT_ORDER, CAT_FORMULAS, CAT_LABELS,
     calcCategories, calcGkCategory, calcBestRating, calcOverall,
@@ -149,6 +150,12 @@ export default function PlayerDetailModal({ player, rank, onClose, teamNames }) 
                 <div style={{ padding: "16px 24px 8px", borderTop: "1px solid rgba(255,255,255,0.04)" }}>
                     <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.3)", letterSpacing: 2, marginBottom: 10 }}>PROGRESS HISTORY</div>
                     <ProgressChart playerId={player.id} />
+                </div>
+
+                {/* Match Stats */}
+                <div style={{ padding: "16px 24px 8px", borderTop: "1px solid rgba(255,255,255,0.04)" }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.3)", letterSpacing: 2, marginBottom: 10 }}>MATCH STATS</div>
+                    <PlayerMatchStats playerId={player.id} />
                 </div>
 
                 {/* All Attributes by Category */}
