@@ -134,6 +134,59 @@ export function subscribeSeasons(callback) {
     })
 }
 
+// ============ ASSESSMENTS ============
+
+const assessmentsRef = collection(db, 'assessments')
+
+export async function saveAssessment(assessment) {
+    await setDoc(doc(db, 'assessments', assessment.id), assessment)
+}
+
+export async function removeAssessment(id) {
+    await deleteDoc(doc(db, 'assessments', id))
+}
+
+export function subscribeAssessments(callback) {
+    return onSnapshot(assessmentsRef, (snapshot) => {
+        const list = snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
+        callback(list)
+    })
+}
+
+// ============ RATING HISTORY ============
+
+const historyRef = collection(db, 'ratingHistory')
+
+export async function saveRatingSnapshot(playerId, playerData, assessmentId, savedByName) {
+    const id = `${playerId}_${Date.now()}`
+    await setDoc(doc(db, 'ratingHistory', id), {
+        id,
+        playerId,
+        assessmentId: assessmentId || "",
+        savedBy: savedByName || "Unknown",
+        timestamp: new Date().toISOString(),
+        ...playerData,
+    })
+}
+
+export function subscribePlayerHistory(playerId, callback) {
+    return onSnapshot(
+        query(historyRef, where('playerId', '==', playerId)),
+        (snapshot) => {
+            const list = snapshot.docs.map(d => d.data())
+                .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
+            callback(list)
+        }
+    )
+}
+
+export async function deletePlayerHistory(playerId) {
+    const snap = await getDocs(query(historyRef, where('playerId', '==', playerId)))
+    const batch = []
+    snap.docs.forEach(d => batch.push(deleteDoc(d.ref)))
+    await Promise.all(batch)
+}
+
 // ============ PLAYERS ============
 
 const playersRef = collection(db, 'players')

@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { subscribePlayers, savePlayer, removePlayer, subscribeTeams } from '../firebase'
+import { subscribePlayers, savePlayer, removePlayer, subscribeTeams, subscribeAssessments, saveRatingSnapshot } from '../firebase'
 import { calcBestRating, calcOverall, calcCategories, CAT_ORDER, CAT_LABELS } from '../utils'
 import PlayerCard from '../components/PlayerCard'
 import Modal from '../components/Modal'
@@ -16,6 +16,7 @@ export default function AdminView() {
     const [search, setSearch] = useState("")
     const [filterTeam, setFilterTeam] = useState("all")
     const [teams, setTeams] = useState([])
+    const [assessments, setAssessments] = useState([])
     const [modal, setModal] = useState(null)
     const [loading, setLoading] = useState(true)
     const [detailPlayer, setDetailPlayer] = useState(null)
@@ -27,8 +28,13 @@ export default function AdminView() {
             setLoading(false)
         })
         const unsub2 = subscribeTeams(setTeams)
-        return () => { unsub(); unsub2() }
+        const unsub3 = subscribeAssessments(setAssessments)
+        return () => { unsub(); unsub2(); unsub3() }
     }, [])
+
+    const activeAssessment = useMemo(() =>
+        assessments.find(a => a.status === 'open') || null
+        , [assessments])
 
     const enriched = useMemo(() =>
         players.map(p => {
@@ -68,8 +74,12 @@ export default function AdminView() {
 
     const handleSave = useCallback(async (p) => {
         await savePlayer(p)
+        // Save rating history snapshot if there's an active assessment
+        if (activeAssessment) {
+            await saveRatingSnapshot(p.id, p, activeAssessment.id, adminData?.name || "Unknown")
+        }
         setModal(null)
-    }, [])
+    }, [activeAssessment, adminData])
 
     const handleDelete = useCallback(async (id) => {
         if (isAssistant) return // Assistants can't delete
@@ -133,9 +143,28 @@ export default function AdminView() {
                     </div>
                 </div>
 
-                <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, textAlign: "center", margin: "0 0 18px", letterSpacing: 2 }}>
+                <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, textAlign: "center", margin: "0 0 8px", letterSpacing: 2 }}>
                     {players.length} LEARNERS • EDIT MODE
                 </p>
+
+                {/* Active Assessment Indicator */}
+                {activeAssessment ? (
+                    <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
+                        <div style={{ background: "rgba(46,204,64,0.08)", border: "1px solid rgba(46,204,64,0.15)", borderRadius: 8, padding: "6px 14px", display: "flex", alignItems: "center", gap: 8 }}>
+                            <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#2ecc40", boxShadow: "0 0 6px rgba(46,204,64,0.4)", animation: "pulse 2s infinite" }} />
+                            <span style={{ color: "#2ecc40", fontSize: 11, fontWeight: 700 }}>Recording: {activeAssessment.name}</span>
+                            <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 9 }}>— ratings will be tracked</span>
+                        </div>
+                    </div>
+                ) : (
+                    <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
+                        <button onClick={() => navigate('/admin/assessments')}
+                            style={{ background: "rgba(255,170,0,0.08)", border: "1px solid rgba(255,170,0,0.15)", borderRadius: 8, padding: "6px 14px", cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }}>
+                            <span style={{ color: "#ffaa00", fontSize: 11, fontWeight: 600 }}>No active assessment — ratings won't be tracked</span>
+                            <span style={{ color: "rgba(255,170,0,0.5)", fontSize: 9 }}>Open one →</span>
+                        </button>
+                    </div>
+                )}
 
                 {/* Filters */}
                 <div style={{ display: "flex", justifyContent: "center", gap: 6, flexWrap: "wrap", marginBottom: 8, alignItems: "center" }}>

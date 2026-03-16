@@ -175,6 +175,15 @@ export default function ManageTeam() {
                         </div>
                         <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 16 }}>→</span>
                     </button>
+                    <button onClick={() => navigate('/admin/assessments')}
+                        style={{ width: "100%", padding: "16px 22px", background: "transparent", border: "none", borderBottom: "1px solid rgba(255,255,255,0.03)", cursor: "pointer", display: "flex", alignItems: "center", gap: 14, textAlign: "left" }}>
+                        <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(155,89,182,0.1)", border: "1px solid rgba(155,89,182,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>📊</div>
+                        <div style={{ flex: 1 }}>
+                            <div style={{ color: "#fff", fontSize: 14, fontWeight: 700 }}>Assessments</div>
+                            <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, marginTop: 2 }}>Create evaluation periods, track rating progress over time</div>
+                        </div>
+                        <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 16 }}>→</span>
+                    </button>
                 </div>
 
                 {/* Role Permissions Info */}

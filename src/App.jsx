@@ -5,6 +5,7 @@ import AdminView from './pages/AdminView'
 import LoginPage from './pages/LoginPage'
 import ManageTeam from './pages/ManageTeam'
 import TeamManager from './pages/TeamManager'
+import AssessmentManager from './pages/AssessmentManager'
 
 function ProtectedRoute({ children, requireHeadCoach }) {
     const { user, isAdmin, isHeadCoach, loading } = useAuth()
@@ -46,6 +47,11 @@ export default function App() {
             <Route path="/admin/teams" element={
                 <ProtectedRoute requireHeadCoach>
                     <TeamManager />
+                </ProtectedRoute>
+            } />
+            <Route path="/admin/assessments" element={
+                <ProtectedRoute>
+                    <AssessmentManager />
                 </ProtectedRoute>
             } />
             <Route path="/admin/:secretKey" element={<Navigate to="/login" replace />} />
