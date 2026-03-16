@@ -6,6 +6,8 @@ import LoginPage from './pages/LoginPage'
 import ManageTeam from './pages/ManageTeam'
 import TeamManager from './pages/TeamManager'
 import AssessmentManager from './pages/AssessmentManager'
+import MatchCenter from './pages/MatchCenter'
+import MatchDetail from './pages/MatchDetail'
 
 function ProtectedRoute({ children, requireHeadCoach }) {
     const { user, isAdmin, isHeadCoach, loading } = useAuth()
@@ -52,6 +54,16 @@ export default function App() {
             <Route path="/admin/assessments" element={
                 <ProtectedRoute>
                     <AssessmentManager />
+                </ProtectedRoute>
+            } />
+            <Route path="/admin/matches" element={
+                <ProtectedRoute>
+                    <MatchCenter />
+                </ProtectedRoute>
+            } />
+            <Route path="/admin/matches/:matchId" element={
+                <ProtectedRoute>
+                    <MatchDetail />
                 </ProtectedRoute>
             } />
             <Route path="/admin/:secretKey" element={<Navigate to="/login" replace />} />

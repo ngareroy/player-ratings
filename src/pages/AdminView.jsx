@@ -112,6 +112,10 @@ export default function AdminView() {
                                 Manage Team
                             </button>
                         )}
+                        <button onClick={() => navigate('/admin/matches')}
+                            style={{ background: "rgba(155,89,182,0.08)", border: "1px solid rgba(155,89,182,0.15)", borderRadius: 8, padding: "7px 12px", color: "rgba(155,89,182,0.7)", fontSize: 10, fontWeight: 700, cursor: "pointer", letterSpacing: 0.5 }}>
+                            Match Center
+                        </button>
                         {/* Profile Avatar */}
                         <button onClick={() => setShowProfile(true)}
                             style={{

@@ -134,6 +134,57 @@ export function subscribeSeasons(callback) {
     })
 }
 
+// ============ MATCHES ============
+
+const matchesRef = collection(db, 'matches')
+
+export async function saveMatch(match) {
+    await setDoc(doc(db, 'matches', match.id), match)
+}
+
+export async function removeMatch(id) {
+    await deleteDoc(doc(db, 'matches', id))
+    // Also delete all stats for this match
+    const snap = await getDocs(query(collection(db, 'matchStats'), where('matchId', '==', id)))
+    await Promise.all(snap.docs.map(d => deleteDoc(d.ref)))
+}
+
+export function subscribeMatches(callback) {
+    return onSnapshot(matchesRef, (snapshot) => {
+        const list = snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
+        callback(list)
+    })
+}
+
+// ============ MATCH STATS (per player per match) ============
+
+const matchStatsRef = collection(db, 'matchStats')
+
+export async function saveMatchStat(stat) {
+    const id = stat.id || `${stat.matchId}_${stat.playerId}`
+    await setDoc(doc(db, 'matchStats', id), { ...stat, id })
+}
+
+export function subscribeMatchStats(matchId, callback) {
+    return onSnapshot(
+        query(matchStatsRef, where('matchId', '==', matchId)),
+        (snapshot) => {
+            const list = snapshot.docs.map(d => d.data())
+            callback(list)
+        }
+    )
+}
+
+export function subscribePlayerMatchStats(playerId, callback) {
+    return onSnapshot(
+        query(matchStatsRef, where('playerId', '==', playerId)),
+        (snapshot) => {
+            const list = snapshot.docs.map(d => d.data())
+            callback(list)
+        }
+    )
+}
+
 // ============ ASSESSMENTS ============
 
 const assessmentsRef = collection(db, 'assessments')
