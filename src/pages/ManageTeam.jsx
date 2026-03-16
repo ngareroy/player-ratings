@@ -161,6 +161,22 @@ export default function ManageTeam() {
                     </div>
                 </div>
 
+                {/* Quick Links */}
+                <div style={{ background: "linear-gradient(145deg,#1a1a2e,#16213e)", borderRadius: 16, border: "1px solid rgba(255,255,255,0.08)", overflow: "hidden", marginBottom: 20 }}>
+                    <div style={{ padding: "18px 22px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                        <h2 style={{ color: "#fff", fontSize: 16, fontWeight: 700, margin: 0 }}>Management</h2>
+                    </div>
+                    <button onClick={() => navigate('/admin/teams')}
+                        style={{ width: "100%", padding: "16px 22px", background: "transparent", border: "none", borderBottom: "1px solid rgba(255,255,255,0.03)", cursor: "pointer", display: "flex", alignItems: "center", gap: 14, textAlign: "left" }}>
+                        <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(52,152,219,0.1)", border: "1px solid rgba(52,152,219,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>⚽</div>
+                        <div style={{ flex: 1 }}>
+                            <div style={{ color: "#fff", fontSize: 14, fontWeight: 700 }}>Teams & Seasons</div>
+                            <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, marginTop: 2 }}>Create age groups, manage seasons, organize squads</div>
+                        </div>
+                        <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 16 }}>→</span>
+                    </button>
+                </div>
+
                 {/* Role Permissions Info */}
                 <div style={{ background: "rgba(255,255,255,0.02)", borderRadius: 14, padding: "20px 22px", border: "1px solid rgba(255,255,255,0.05)" }}>
                     <h3 style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, fontWeight: 700, letterSpacing: 1.5, margin: "0 0 14px" }}>ROLE PERMISSIONS</h3>

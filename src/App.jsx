@@ -4,6 +4,7 @@ import PublicView from './pages/PublicView'
 import AdminView from './pages/AdminView'
 import LoginPage from './pages/LoginPage'
 import ManageTeam from './pages/ManageTeam'
+import TeamManager from './pages/TeamManager'
 
 function ProtectedRoute({ children, requireHeadCoach }) {
     const { user, isAdmin, isHeadCoach, loading } = useAuth()
@@ -42,7 +43,11 @@ export default function App() {
                     <ManageTeam />
                 </ProtectedRoute>
             } />
-            {/* Redirect old secret URL to new login */}
+            <Route path="/admin/teams" element={
+                <ProtectedRoute requireHeadCoach>
+                    <TeamManager />
+                </ProtectedRoute>
+            } />
             <Route path="/admin/:secretKey" element={<Navigate to="/login" replace />} />
         </Routes>
     )

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { subscribePlayers } from '../firebase'
+import { subscribePlayers, subscribeTeams } from '../firebase'
 import { calcBestRating, calcOverall, calcCategories, CAT_ORDER, CAT_LABELS } from '../utils'
 import PlayerCard from '../components/PlayerCard'
 import PlayerDetailModal from '../components/PlayerDetailModal'
@@ -9,6 +9,8 @@ export default function PublicView() {
     const [players, setPlayers] = useState([])
     const [sortBy, setSortBy] = useState("total")
     const [search, setSearch] = useState("")
+    const [filterTeam, setFilterTeam] = useState("all")
+    const [teams, setTeams] = useState([])
     const [loading, setLoading] = useState(true)
     const [detailPlayer, setDetailPlayer] = useState(null)
 
@@ -17,7 +19,8 @@ export default function PublicView() {
             setPlayers(data)
             setLoading(false)
         })
-        return () => unsub()
+        const unsub2 = subscribeTeams(setTeams)
+        return () => { unsub(); unsub2() }
     }, [])
 
     const enriched = useMemo(() =>
@@ -38,10 +41,12 @@ export default function PublicView() {
     const sorted = useMemo(() => {
         let list = [...enriched]
         if (search) list = list.filter(p => p.name.toLowerCase().includes(search.toLowerCase()))
+        if (filterTeam === "unassigned") list = list.filter(p => !p.teamId)
+        else if (filterTeam !== "all") list = list.filter(p => p.teamId === filterTeam)
         if (sortBy === "total") list.sort((a, b) => b.total - a.total)
         else list.sort((a, b) => (b.cats[sortBy] || 0) - (a.cats[sortBy] || 0))
         return list
-    }, [enriched, sortBy, search])
+    }, [enriched, sortBy, search, filterTeam])
 
     const navigate = useNavigate()
 
@@ -71,6 +76,23 @@ export default function PublicView() {
                             }}>{o.label}</button>
                     ))}
                 </div>
+
+                {/* Team Filter */}
+                {teams.length > 0 && (
+                    <div style={{ display: "flex", justifyContent: "center", gap: 6, flexWrap: "wrap", marginBottom: 20, alignItems: "center" }}>
+                        <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 9, fontWeight: 700, letterSpacing: 1 }}>TEAM:</span>
+                        {[{ id: "all", label: "All Players" }, ...teams.map(t => ({ id: t.id, label: t.name }))].map(t => (
+                            <button key={t.id} onClick={() => setFilterTeam(t.id)}
+                                style={{
+                                    background: filterTeam === t.id ? "rgba(52,152,219,0.2)" : "rgba(255,255,255,0.04)",
+                                    border: filterTeam === t.id ? "1px solid #3498db" : "1px solid rgba(255,255,255,0.08)",
+                                    borderRadius: 6, padding: "5px 10px",
+                                    color: filterTeam === t.id ? "#3498db" : "rgba(255,255,255,0.35)",
+                                    fontSize: 10, fontWeight: 700, cursor: "pointer", letterSpacing: 0.3
+                                }}>{t.label}</button>
+                        ))}
+                    </div>
+                )}
 
                 {loading ? (
                     <p style={{ color: "rgba(255,255,255,0.4)", textAlign: "center", marginTop: 60 }}>Loading players...</p>

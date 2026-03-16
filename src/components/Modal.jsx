@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
     ATTRS, GK_ATTRS, CAT_ORDER, CAT_FORMULAS, POS_GROUPS,
     calcCategories, calcGkCategory, calcBestRating, calcOverall,
     calcAllPositionRatings, getAllUsedJerseyNumbers,
     getRatingColor, getOvrBg
 } from '../utils'
+import { subscribeTeams } from '../firebase'
 
 function AttrSlider({ attr, value, onChange, disabled }) {
     const color = disabled ? "rgba(255,255,255,0.15)" : getRatingColor(value)
@@ -28,6 +29,8 @@ function AttrSlider({ attr, value, onChange, disabled }) {
 
 export default function Modal({ player, onSave, onClose, isNew, allPlayers }) {
     const [name, setName] = useState(player?.name || "")
+    const [teamId, setTeamId] = useState(player?.teamId || "")
+    const [teams, setTeams] = useState([])
     const [positions, setPositions] = useState(player?.positions || [])
     const [jerseyNumber, setJerseyNumber] = useState(player?.jerseyNumber || "")
     const [gkJerseyNumber, setGkJerseyNumber] = useState(player?.gkJerseyNumber || "")
@@ -39,6 +42,11 @@ export default function Modal({ player, onSave, onClose, isNew, allPlayers }) {
         return a
     })
     const setAttr = (k, v) => setAttrs(prev => ({ ...prev, [k]: v }))
+
+    useEffect(() => {
+        const unsub = subscribeTeams(setTeams)
+        return () => unsub()
+    }, [])
 
     const hasGK = positions.includes("GK")
     const hasOutfield = positions.some(p => p !== "GK")
@@ -108,7 +116,7 @@ export default function Modal({ player, onSave, onClose, isNew, allPlayers }) {
 
         onSave({
             ...player, ...attrs, ...gkAttrs,
-            name: name.trim(), positions,
+            name: name.trim(), positions, teamId,
             jerseyNumber: saveJersey,
             gkJerseyNumber: saveGkJersey,
             id: player?.id || Date.now().toString()
@@ -142,6 +150,34 @@ export default function Modal({ player, onSave, onClose, isNew, allPlayers }) {
                 {error && (
                     <div style={{ margin: "8px 24px 0", padding: "8px 12px", background: "rgba(231,76,60,0.15)", border: "1px solid rgba(231,76,60,0.3)", borderRadius: 8, color: "#e74c3c", fontSize: 12, fontWeight: 600 }}>{error}</div>
                 )}
+
+                {/* Team Assignment */}
+                <div style={{ padding: "14px 24px 10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                    <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, letterSpacing: 1.5, display: "block", marginBottom: 8 }}>TEAM</label>
+                    <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                        <button onClick={() => setTeamId("")}
+                            style={{
+                                background: !teamId ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.04)",
+                                border: !teamId ? "1px solid rgba(255,255,255,0.25)" : "1px solid rgba(255,255,255,0.1)",
+                                borderRadius: 6, padding: "6px 12px",
+                                color: !teamId ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.35)",
+                                fontSize: 11, fontWeight: 600, cursor: "pointer"
+                            }}>Unassigned</button>
+                        {teams.map(t => (
+                            <button key={t.id} onClick={() => setTeamId(t.id)}
+                                style={{
+                                    background: teamId === t.id ? "rgba(52,152,219,0.2)" : "rgba(255,255,255,0.04)",
+                                    border: teamId === t.id ? "1px solid #3498db" : "1px solid rgba(255,255,255,0.1)",
+                                    borderRadius: 6, padding: "6px 12px",
+                                    color: teamId === t.id ? "#3498db" : "rgba(255,255,255,0.35)",
+                                    fontSize: 11, fontWeight: 700, cursor: "pointer", letterSpacing: 0.3
+                                }}>
+                                {t.name}
+                                <span style={{ marginLeft: 4, opacity: 0.5, fontSize: 9 }}>{t.ageGroup}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
 
                 {/* Position Selection */}
                 <div style={{ padding: "14px 24px 10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>

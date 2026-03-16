@@ -96,6 +96,44 @@ export async function getAdminCount() {
     return snap.size
 }
 
+// ============ TEAMS ============
+
+const teamsRef = collection(db, 'teams')
+
+export async function saveTeam(team) {
+    await setDoc(doc(db, 'teams', team.id), team)
+}
+
+export async function removeTeam(id) {
+    await deleteDoc(doc(db, 'teams', id))
+}
+
+export function subscribeTeams(callback) {
+    return onSnapshot(teamsRef, (snapshot) => {
+        const teams = snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
+        callback(teams)
+    })
+}
+
+// ============ SEASONS ============
+
+const seasonsRef = collection(db, 'seasons')
+
+export async function saveSeason(season) {
+    await setDoc(doc(db, 'seasons', season.id), season)
+}
+
+export async function removeSeason(id) {
+    await deleteDoc(doc(db, 'seasons', id))
+}
+
+export function subscribeSeasons(callback) {
+    return onSnapshot(seasonsRef, (snapshot) => {
+        const seasons = snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
+        callback(seasons)
+    })
+}
+
 // ============ PLAYERS ============
 
 const playersRef = collection(db, 'players')

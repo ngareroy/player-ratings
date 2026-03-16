@@ -4,7 +4,7 @@ import {
     calcGkCategory, getRatingColor, getOvrBg, CAT_ORDER, CAT_LABELS
 } from '../utils'
 
-export default function PlayerCard({ player, rank, isAdmin, onEdit, onDelete, onClick }) {
+export default function PlayerCard({ player, rank, isAdmin, onEdit, onDelete, onClick, teamName }) {
     const cats = calcCategories(player)
     const positions = player.positions || []
     const posRatings = calcAllPositionRatings(player)
