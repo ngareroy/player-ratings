@@ -11,16 +11,20 @@ export function AuthProvider({ children }) {
     const [user, setUser] = useState(null)
     const [adminData, setAdminData] = useState(null)
     const [loading, setLoading] = useState(true)
+    const [roleLoading, setRoleLoading] = useState(false)
 
     useEffect(() => {
         const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
             if (firebaseUser) {
                 setUser(firebaseUser)
+                setRoleLoading(true)
                 const role = await getAdminRole(firebaseUser.uid)
                 setAdminData(role)
+                setRoleLoading(false)
             } else {
                 setUser(null)
                 setAdminData(null)
+                setRoleLoading(false)
             }
             setLoading(false)
         })
@@ -43,7 +47,7 @@ export function AuthProvider({ children }) {
     const value = {
         user,
         adminData,
-        loading,
+        loading: loading || roleLoading,
         isAdmin: !!adminData,
         isHeadCoach: adminData?.role === 'head_coach',
         isAssistant: adminData?.role === 'assistant_coach',

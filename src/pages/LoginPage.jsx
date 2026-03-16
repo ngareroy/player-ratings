@@ -35,7 +35,6 @@ export default function LoginPage() {
             navigate('/admin')
         }
         if (!loading && user && !isAdmin) {
-            // Logged in but not an admin
             setAccessDenied(true)
         }
     }, [user, isAdmin, loading, navigate])
