@@ -1,21 +1,21 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import { useParams, Navigate } from 'react-router-dom'
-import { subscribePlayers, savePlayer, removePlayer, ADMIN_SECRET } from '../firebase'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
+import { subscribePlayers, savePlayer, removePlayer } from '../firebase'
 import { calcBestRating, calcOverall, calcCategories, CAT_ORDER, CAT_LABELS } from '../utils'
 import PlayerCard from '../components/PlayerCard'
 import Modal from '../components/Modal'
 import PlayerDetailModal from '../components/PlayerDetailModal'
 
 export default function AdminView() {
-    const { secretKey } = useParams()
+    const { user, adminData, isHeadCoach, isAssistant, logout } = useAuth()
+    const navigate = useNavigate()
     const [players, setPlayers] = useState([])
     const [sortBy, setSortBy] = useState("total")
     const [search, setSearch] = useState("")
     const [modal, setModal] = useState(null)
     const [loading, setLoading] = useState(true)
     const [detailPlayer, setDetailPlayer] = useState(null)
-
-    if (secretKey !== ADMIN_SECRET) return <Navigate to="/" replace />
 
     useEffect(() => {
         const unsub = subscribePlayers((data) => {
@@ -54,19 +54,53 @@ export default function AdminView() {
     }, [])
 
     const handleDelete = useCallback(async (id) => {
+        if (isAssistant) return // Assistants can't delete
         if (!confirm("Remove this learner?")) return
         await removePlayer(id)
-    }, [])
+    }, [isAssistant])
+
+    const handleLogout = async () => {
+        await logout()
+        navigate('/')
+    }
+
+    const roleName = isHeadCoach ? "Head Coach" : "Assistant Coach"
 
     return (
         <div style={{ minHeight: "100vh", background: "#0a0a1a", padding: "20px 12px", fontFamily: "system-ui" }}>
             <div style={{ maxWidth: 1280, margin: "0 auto" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 2 }}>
-                    <h1 style={{ color: "#fff", fontSize: 26, fontWeight: 800, textAlign: "center", margin: 0, letterSpacing: 1 }}>PLAYER RATINGS</h1>
-                    <span style={{ background: "rgba(46,204,64,0.15)", color: "#2ecc40", fontSize: 9, fontWeight: 700, padding: "3px 8px", borderRadius: 6, letterSpacing: 1 }}>ADMIN</span>
-                </div>
-                <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, textAlign: "center", margin: "0 0 18px", letterSpacing: 2 }}>{players.length} LEARNERS • EDIT MODE</p>
 
+                {/* Top Bar */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <h1 style={{ color: "#fff", fontSize: 22, fontWeight: 800, margin: 0, letterSpacing: 1 }}>PLAYER RATINGS</h1>
+                        <span style={{ background: "rgba(46,204,64,0.15)", color: "#2ecc40", fontSize: 9, fontWeight: 700, padding: "3px 8px", borderRadius: 6, letterSpacing: 1 }}>ADMIN</span>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div style={{ textAlign: "right" }}>
+                            <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, fontWeight: 600 }}>
+                                {adminData?.name || user?.email}
+                            </div>
+                            <div style={{ color: "rgba(255,255,255,0.25)", fontSize: 9, letterSpacing: 1 }}>{roleName.toUpperCase()}</div>
+                        </div>
+                        {isHeadCoach && (
+                            <button onClick={() => navigate('/admin/manage')}
+                                style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "7px 12px", color: "rgba(255,255,255,0.5)", fontSize: 10, fontWeight: 700, cursor: "pointer", letterSpacing: 0.5 }}>
+                                Manage Team
+                            </button>
+                        )}
+                        <button onClick={handleLogout}
+                            style={{ background: "rgba(231,76,60,0.1)", border: "1px solid rgba(231,76,60,0.15)", borderRadius: 8, padding: "7px 14px", color: "#e74c3c", fontSize: 10, fontWeight: 700, cursor: "pointer", letterSpacing: 0.5 }}>
+                            Logout
+                        </button>
+                    </div>
+                </div>
+
+                <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, textAlign: "center", margin: "0 0 18px", letterSpacing: 2 }}>
+                    {players.length} LEARNERS • EDIT MODE
+                </p>
+
+                {/* Filters */}
                 <div style={{ display: "flex", justifyContent: "center", gap: 6, flexWrap: "wrap", marginBottom: 20, alignItems: "center" }}>
                     <input type="text" placeholder="Search..." value={search} onChange={e => setSearch(e.target.value)}
                         style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "7px 12px", color: "#fff", fontSize: 12, outline: "none", width: 140 }} />
@@ -81,9 +115,12 @@ export default function AdminView() {
                             }}>{o.label}</button>
                     ))}
                     <button onClick={() => setModal({ isNew: true, player: null })}
-                        style={{ background: "linear-gradient(135deg,#1a6b1a,#2ecc40)", border: "none", borderRadius: 8, padding: "7px 16px", color: "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer", letterSpacing: .5, marginLeft: 4 }}>+ ADD LEARNER</button>
+                        style={{ background: "linear-gradient(135deg,#1a6b1a,#2ecc40)", border: "none", borderRadius: 8, padding: "7px 16px", color: "#fff", fontSize: 11, fontWeight: 700, cursor: "pointer", letterSpacing: .5, marginLeft: 4 }}>
+                        + ADD LEARNER
+                    </button>
                 </div>
 
+                {/* Player Cards */}
                 {loading ? (
                     <p style={{ color: "rgba(255,255,255,0.4)", textAlign: "center", marginTop: 60 }}>Loading players...</p>
                 ) : (
@@ -91,7 +128,8 @@ export default function AdminView() {
                         {sorted.map(p => (
                             <PlayerCard key={p.id} player={p} rank={ranks[p.id]} isAdmin={true}
                                 onEdit={pl => setModal({ isNew: false, player: pl })}
-                                onDelete={handleDelete} onClick={setDetailPlayer} />
+                                onDelete={isHeadCoach ? handleDelete : null}
+                                onClick={setDetailPlayer} />
                         ))}
                         {sorted.length === 0 && <p style={{ color: "rgba(255,255,255,0.3)" }}>No learners found.</p>}
                     </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { subscribePlayers } from '../firebase'
 import { calcBestRating, calcOverall, calcCategories, CAT_ORDER, CAT_LABELS } from '../utils'
 import PlayerCard from '../components/PlayerCard'
@@ -42,10 +43,18 @@ export default function PublicView() {
         return list
     }, [enriched, sortBy, search])
 
+    const navigate = useNavigate()
+
     return (
         <div style={{ minHeight: "100vh", background: "#0a0a1a", padding: "20px 12px", fontFamily: "system-ui" }}>
             <div style={{ maxWidth: 1280, margin: "0 auto" }}>
-                <h1 style={{ color: "#fff", fontSize: 26, fontWeight: 800, textAlign: "center", margin: "0 0 2px", letterSpacing: 1 }}>PLAYER RATINGS</h1>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", position: "relative", marginBottom: 2 }}>
+                    <h1 style={{ color: "#fff", fontSize: 26, fontWeight: 800, textAlign: "center", margin: 0, letterSpacing: 1 }}>PLAYER RATINGS</h1>
+                    <button onClick={() => navigate('/login')}
+                        style={{ position: "absolute", right: 0, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "6px 14px", color: "rgba(255,255,255,0.25)", fontSize: 10, fontWeight: 600, cursor: "pointer", letterSpacing: 0.5 }}>
+                        Coach Login
+                    </button>
+                </div>
                 <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, textAlign: "center", margin: "0 0 18px", letterSpacing: 2 }}>{players.length} LEARNERS</p>
 
                 <div style={{ display: "flex", justifyContent: "center", gap: 6, flexWrap: "wrap", marginBottom: 20, alignItems: "center" }}>

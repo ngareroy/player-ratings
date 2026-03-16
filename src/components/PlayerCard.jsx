@@ -37,11 +37,13 @@ export default function PlayerCard({ player, rank, isAdmin, onEdit, onDelete, on
                         width: 28, height: 28, cursor: "pointer", color: "#fff", fontSize: 13,
                         display: "flex", alignItems: "center", justifyContent: "center"
                     }}>✏️</button>
-                    <button onClick={e => { e.stopPropagation(); onDelete(player.id) }} style={{
-                        background: "rgba(255,60,60,0.15)", border: "none", borderRadius: 6,
-                        width: 28, height: 28, cursor: "pointer", color: "#e74c3c", fontSize: 13,
-                        display: "flex", alignItems: "center", justifyContent: "center"
-                    }}>✕</button>
+                    {onDelete && (
+                        <button onClick={e => { e.stopPropagation(); onDelete(player.id) }} style={{
+                            background: "rgba(255,60,60,0.15)", border: "none", borderRadius: 6,
+                            width: 28, height: 28, cursor: "pointer", color: "#e74c3c", fontSize: 13,
+                            display: "flex", alignItems: "center", justifyContent: "center"
+                        }}>✕</button>
+                    )}
                 </div>
             )}
 
