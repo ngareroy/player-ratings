@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { subscribeAdmins, removeAdmin, subscribePlayers } from '../firebase'
 import InviteCoachModal from '../components/InviteCoachModal'
+import { getAvatarDisplay } from '../components/CoachProfileModal'
 
 export default function ManageTeam() {
     const { user, isHeadCoach, adminData, logout } = useAuth()
@@ -95,14 +96,19 @@ export default function ManageTeam() {
                                     transition: "background 0.2s",
                                 }}>
                                     {/* Avatar */}
-                                    <div style={{
-                                        width: 40, height: 40, borderRadius: 10, flexShrink: 0,
-                                        background: isHead ? "linear-gradient(135deg,#8a6b00,#ffaa00)" : "linear-gradient(135deg,#1a4a8a,#3498db)",
-                                        display: "flex", alignItems: "center", justifyContent: "center",
-                                        fontSize: 16, fontWeight: 800, color: "#fff",
-                                    }}>
-                                        {(admin.name || admin.email || "?")[0].toUpperCase()}
-                                    </div>
+                                    {(() => {
+                                        const av = getAvatarDisplay(admin)
+                                        return (
+                                            <div style={{
+                                                width: 40, height: 40, borderRadius: 10, flexShrink: 0,
+                                                background: av.bg,
+                                                display: "flex", alignItems: "center", justifyContent: "center",
+                                                fontSize: av.emoji ? 18 : 16, fontWeight: 800, color: "#fff",
+                                            }}>
+                                                {av.emoji || av.initial}
+                                            </div>
+                                        )
+                                    })()}
 
                                     {/* Info */}
                                     <div style={{ flex: 1, minWidth: 0 }}>

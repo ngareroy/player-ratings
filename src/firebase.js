@@ -67,8 +67,17 @@ export async function getAdminRole(uid) {
     return null
 }
 
-export async function setAdminRole(uid, email, role, name) {
-    await setDoc(doc(db, 'admins', uid), { email, role, name, createdAt: new Date().toISOString() })
+export async function setAdminRole(uid, email, role, name, avatar, avatarColor) {
+    const existing = await getDoc(doc(db, 'admins', uid))
+    const prev = existing.exists() ? existing.data() : {}
+    await setDoc(doc(db, 'admins', uid), {
+        email,
+        role,
+        name,
+        avatar: avatar !== undefined ? avatar : (prev.avatar || ""),
+        avatarColor: avatarColor !== undefined ? avatarColor : (prev.avatarColor || "green"),
+        createdAt: prev.createdAt || new Date().toISOString(),
+    })
 }
 
 export async function removeAdmin(uid) {

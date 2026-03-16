@@ -6,6 +6,7 @@ import { calcBestRating, calcOverall, calcCategories, CAT_ORDER, CAT_LABELS } fr
 import PlayerCard from '../components/PlayerCard'
 import Modal from '../components/Modal'
 import PlayerDetailModal from '../components/PlayerDetailModal'
+import CoachProfileModal, { getAvatarDisplay } from '../components/CoachProfileModal'
 
 export default function AdminView() {
     const { user, adminData, isHeadCoach, isAssistant, logout } = useAuth()
@@ -16,6 +17,7 @@ export default function AdminView() {
     const [modal, setModal] = useState(null)
     const [loading, setLoading] = useState(true)
     const [detailPlayer, setDetailPlayer] = useState(null)
+    const [showProfile, setShowProfile] = useState(false)
 
     useEffect(() => {
         const unsub = subscribePlayers((data) => {
@@ -65,6 +67,7 @@ export default function AdminView() {
     }
 
     const roleName = isHeadCoach ? "Head Coach" : "Assistant Coach"
+    const av = getAvatarDisplay(adminData)
 
     return (
         <div style={{ minHeight: "100vh", background: "#0a0a1a", padding: "20px 12px", fontFamily: "system-ui" }}>
@@ -77,18 +80,36 @@ export default function AdminView() {
                         <span style={{ background: "rgba(46,204,64,0.15)", color: "#2ecc40", fontSize: 9, fontWeight: 700, padding: "3px 8px", borderRadius: 6, letterSpacing: 1 }}>ADMIN</span>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <div style={{ textAlign: "right" }}>
-                            <div style={{ color: "rgba(255,255,255,0.5)", fontSize: 11, fontWeight: 600 }}>
-                                {adminData?.name || user?.email}
-                            </div>
-                            <div style={{ color: "rgba(255,255,255,0.25)", fontSize: 9, letterSpacing: 1 }}>{roleName.toUpperCase()}</div>
-                        </div>
                         {isHeadCoach && (
                             <button onClick={() => navigate('/admin/manage')}
                                 style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "7px 12px", color: "rgba(255,255,255,0.5)", fontSize: 10, fontWeight: 700, cursor: "pointer", letterSpacing: 0.5 }}>
                                 Manage Team
                             </button>
                         )}
+                        {/* Profile Avatar */}
+                        <button onClick={() => setShowProfile(true)}
+                            style={{
+                                display: "flex", alignItems: "center", gap: 10, padding: "4px 12px 4px 4px",
+                                background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
+                                borderRadius: 12, cursor: "pointer", transition: "background 0.2s",
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.08)"}
+                            onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.04)"}
+                        >
+                            <div style={{
+                                width: 34, height: 34, borderRadius: 9, background: av.bg,
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                fontSize: av.emoji ? 16 : 14, fontWeight: 800, color: "#fff", flexShrink: 0
+                            }}>
+                                {av.emoji || av.initial}
+                            </div>
+                            <div style={{ textAlign: "left" }}>
+                                <div style={{ color: "rgba(255,255,255,0.7)", fontSize: 11, fontWeight: 600, lineHeight: 1.2 }}>
+                                    {adminData?.name || user?.email}
+                                </div>
+                                <div style={{ color: "rgba(255,255,255,0.25)", fontSize: 8, letterSpacing: 1, fontWeight: 600 }}>{roleName.toUpperCase()}</div>
+                            </div>
+                        </button>
                         <button onClick={handleLogout}
                             style={{ background: "rgba(231,76,60,0.1)", border: "1px solid rgba(231,76,60,0.15)", borderRadius: 8, padding: "7px 14px", color: "#e74c3c", fontSize: 10, fontWeight: 700, cursor: "pointer", letterSpacing: 0.5 }}>
                             Logout
@@ -142,6 +163,14 @@ export default function AdminView() {
             {detailPlayer && (
                 <PlayerDetailModal player={detailPlayer} rank={ranks[detailPlayer.id]}
                     onClose={() => setDetailPlayer(null)} />
+            )}
+
+            {showProfile && (
+                <CoachProfileModal
+                    adminData={adminData}
+                    user={user}
+                    onClose={() => setShowProfile(false)}
+                />
             )}
         </div>
     )
