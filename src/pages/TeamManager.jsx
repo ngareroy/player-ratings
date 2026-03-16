@@ -181,7 +181,7 @@ export default function TeamManager() {
                 {/* Top Bar */}
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 8 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <button onClick={() => navigate('/admin')}
+                        <button onClick={() => navigate('/admin/manage')}
                             style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "7px 14px", color: "rgba(255,255,255,0.5)", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>
                             ← Back
                         </button>
