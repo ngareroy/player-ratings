@@ -44,7 +44,7 @@ export default function LoginPage() {
     const [deniedTimer, setDeniedTimer] = useState(false)
     useEffect(() => {
         if (user && !isAdmin && !loading) {
-            const t = setTimeout(() => setDeniedTimer(true), 1500)
+            const t = setTimeout(() => setDeniedTimer(true), 3500)
             return () => clearTimeout(t)
         } else {
             setDeniedTimer(false)
