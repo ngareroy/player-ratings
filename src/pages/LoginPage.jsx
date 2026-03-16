@@ -18,8 +18,13 @@ export default function LoginPage() {
     // Check if this is first-time setup (no admins exist yet)
     useEffect(() => {
         (async () => {
-            const count = await getAdminCount()
-            setIsSetup(count === 0)
+            try {
+                const count = await getAdminCount()
+                setIsSetup(count === 0)
+            } catch (err) {
+                console.error("Could not check admin count:", err)
+                setIsSetup(false)
+            }
             setCheckingSetup(false)
         })()
     }, [])
