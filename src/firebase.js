@@ -12,7 +12,6 @@ const firebaseConfig = {
     appId: "1:882859560495:web:e7960f6d6b5e4315dac0da"
 }
 
-
 const app = initializeApp(firebaseConfig)
 const db = getFirestore(app)
 const auth = getAuth(app)
@@ -28,6 +27,23 @@ export function loginWithEmail(email, password) {
 
 export function registerWithEmail(email, password) {
     return createUserWithEmailAndPassword(auth, email, password)
+}
+
+// Create account WITHOUT signing in as that user (for invites)
+export async function createAccountWithoutSignIn(email, password) {
+    const { initializeApp, deleteApp } = await import('firebase/app')
+    const { getAuth, createUserWithEmailAndPassword } = await import('firebase/auth')
+    const tempApp = initializeApp(firebaseConfig, 'temp-' + Date.now())
+    const tempAuth = getAuth(tempApp)
+    try {
+        const cred = await createUserWithEmailAndPassword(tempAuth, email, password)
+        const uid = cred.user.uid
+        await deleteApp(tempApp)
+        return uid
+    } catch (err) {
+        await deleteApp(tempApp)
+        throw err
+    }
 }
 
 export function loginWithGoogle() {

@@ -3,9 +3,10 @@ import { useAuth } from './contexts/AuthContext'
 import PublicView from './pages/PublicView'
 import AdminView from './pages/AdminView'
 import LoginPage from './pages/LoginPage'
+import ManageTeam from './pages/ManageTeam'
 
-function ProtectedRoute({ children }) {
-    const { user, isAdmin, loading } = useAuth()
+function ProtectedRoute({ children, requireHeadCoach }) {
+    const { user, isAdmin, isHeadCoach, loading } = useAuth()
 
     if (loading) {
         return (
@@ -19,6 +20,10 @@ function ProtectedRoute({ children }) {
         return <Navigate to="/login" replace />
     }
 
+    if (requireHeadCoach && !isHeadCoach) {
+        return <Navigate to="/admin" replace />
+    }
+
     return children
 }
 
@@ -30,6 +35,11 @@ export default function App() {
             <Route path="/admin" element={
                 <ProtectedRoute>
                     <AdminView />
+                </ProtectedRoute>
+            } />
+            <Route path="/admin/manage" element={
+                <ProtectedRoute requireHeadCoach>
+                    <ManageTeam />
                 </ProtectedRoute>
             } />
             {/* Redirect old secret URL to new login */}
