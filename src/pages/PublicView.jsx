@@ -41,8 +41,8 @@ export default function PublicView() {
     const sorted = useMemo(() => {
         let list = [...enriched]
         if (search) list = list.filter(p => p.name.toLowerCase().includes(search.toLowerCase()))
-        if (filterTeam === "unassigned") list = list.filter(p => !p.teamId)
-        else if (filterTeam !== "all") list = list.filter(p => p.teamId === filterTeam)
+        if (filterTeam === "unassigned") list = list.filter(p => !(p.teamIds?.length) && !p.teamId)
+        else if (filterTeam !== "all") list = list.filter(p => (p.teamIds || (p.teamId ? [p.teamId] : [])).includes(filterTeam))
         if (sortBy === "total") list.sort((a, b) => b.total - a.total)
         else list.sort((a, b) => (b.cats[sortBy] || 0) - (a.cats[sortBy] || 0))
         return list
@@ -53,6 +53,11 @@ export default function PublicView() {
         teams.forEach(t => m[t.id] = t.name)
         return m
     }, [teams])
+
+    const getTeamNames = (p) => {
+        const ids = p.teamIds || (p.teamId ? [p.teamId] : [])
+        return ids.map(id => teamMap[id]).filter(Boolean)
+    }
 
     const navigate = useNavigate()
 
@@ -106,7 +111,7 @@ export default function PublicView() {
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 18, justifyContent: "center" }}>
                         {sorted.map(p => (
                             <PlayerCard key={p.id} player={p} rank={ranks[p.id]} isAdmin={false}
-                                teamName={teamMap[p.teamId] || ""}
+                                teamNames={getTeamNames(p)}
                                 onClick={setDetailPlayer} />
                         ))}
                         {sorted.length === 0 && <p style={{ color: "rgba(255,255,255,0.3)" }}>No learners found.</p>}
@@ -118,7 +123,7 @@ export default function PublicView() {
                 <PlayerDetailModal
                     player={detailPlayer}
                     rank={ranks[detailPlayer.id]}
-                    teamName={teamMap[detailPlayer.teamId] || ""}
+                    teamNames={getTeamNames(detailPlayer)}
                     onClose={() => setDetailPlayer(null)}
                 />
             )}

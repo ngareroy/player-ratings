@@ -143,21 +143,18 @@ export function calcAge(dob) {
 
 export function suggestTeam(dob, teams) {
     const age = calcAge(dob)
-    if (age === null || !teams || teams.length === 0) return ""
-    // Find best matching age group team
+    if (age === null || !teams || teams.length === 0) return []
     const ageGroups = teams.map(t => {
         const match = t.ageGroup?.match(/^U(\d+)$/)
         if (!match) return { team: t, maxAge: 99 }
         return { team: t, maxAge: parseInt(match[1]) }
     }).filter(t => t.maxAge !== 99)
         .sort((a, b) => a.maxAge - b.maxAge)
-    // Find the smallest age group where the player's age fits
     for (const ag of ageGroups) {
-        if (age < ag.maxAge) return ag.team.id
+        if (age < ag.maxAge) return [ag.team.id]
     }
-    // If older than all groups, return the largest
-    if (ageGroups.length > 0) return ageGroups[ageGroups.length - 1].team.id
-    return ""
+    if (ageGroups.length > 0) return [ageGroups[ageGroups.length - 1].team.id]
+    return []
 }
 
 export function getRatingColor(v) {

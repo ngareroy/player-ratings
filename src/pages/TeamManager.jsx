@@ -143,10 +143,13 @@ export default function TeamManager() {
 
     const playerCountByTeam = useMemo(() => {
         const map = {}
+        let unassigned = 0
         players.forEach(p => {
-            const tid = p.teamId || "unassigned"
-            map[tid] = (map[tid] || 0) + 1
+            const ids = p.teamIds || (p.teamId ? [p.teamId] : [])
+            if (ids.length === 0) { unassigned++; return }
+            ids.forEach(tid => { map[tid] = (map[tid] || 0) + 1 })
         })
+        map["unassigned"] = unassigned
         return map
     }, [players])
 

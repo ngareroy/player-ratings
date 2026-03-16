@@ -4,7 +4,7 @@ import {
     calcGkCategory, calcAge, getRatingColor, getOvrBg, CAT_ORDER, CAT_LABELS
 } from '../utils'
 
-export default function PlayerCard({ player, rank, isAdmin, onEdit, onDelete, onClick, teamName }) {
+export default function PlayerCard({ player, rank, isAdmin, onEdit, onDelete, onClick, teamNames }) {
     const cats = calcCategories(player)
     const positions = player.positions || []
     const posRatings = calcAllPositionRatings(player)
@@ -63,12 +63,12 @@ export default function PlayerCard({ player, rank, isAdmin, onEdit, onDelete, on
                         {age !== null && (
                             <span style={{ color: "rgba(255,255,255,0.25)", fontSize: 9, fontWeight: 600 }}>Age {age}</span>
                         )}
-                        {teamName && (
-                            <span style={{
+                        {(teamNames || []).map((tn, i) => (
+                            <span key={i} style={{
                                 background: "rgba(52,152,219,0.12)", color: "#3498db",
                                 fontSize: 9, fontWeight: 700, padding: "1px 6px", borderRadius: 4, letterSpacing: 0.5
-                            }}>{teamName}</span>
-                        )}
+                            }}>{tn}</span>
+                        ))}
                         {positions.map(p => (
                             <span key={p} style={{
                                 background: p === "GK" ? "rgba(255,170,0,0.15)" : "rgba(46,204,64,0.15)",

@@ -31,7 +31,7 @@ function AttrSlider({ attr, value, onChange, disabled }) {
 export default function Modal({ player, onSave, onClose, isNew, allPlayers }) {
     const [name, setName] = useState(player?.name || "")
     const [dob, setDob] = useState(player?.dob || "")
-    const [teamId, setTeamId] = useState(player?.teamId || "")
+    const [teamIds, setTeamIds] = useState(player?.teamIds || (player?.teamId ? [player.teamId] : []))
     const [teamAutoSet, setTeamAutoSet] = useState(false)
     const [teams, setTeams] = useState([])
     const [positions, setPositions] = useState(player?.positions || [])
@@ -53,10 +53,10 @@ export default function Modal({ player, onSave, onClose, isNew, allPlayers }) {
 
     // Auto-assign team when DOB changes (only if not manually set)
     useEffect(() => {
-        if (dob && teams.length > 0 && (isNew || !player?.teamId || teamAutoSet)) {
+        if (dob && teams.length > 0 && (isNew || (!player?.teamIds?.length && !player?.teamId) || teamAutoSet)) {
             const suggested = suggestTeam(dob, teams)
-            if (suggested) {
-                setTeamId(suggested)
+            if (suggested.length > 0) {
+                setTeamIds(suggested)
                 setTeamAutoSet(true)
             }
         }
@@ -131,7 +131,7 @@ export default function Modal({ player, onSave, onClose, isNew, allPlayers }) {
 
         onSave({
             ...player, ...attrs, ...gkAttrs,
-            name: name.trim(), positions, teamId, dob,
+            name: name.trim(), positions, teamIds, dob,
             jerseyNumber: saveJersey,
             gkJerseyNumber: saveGkJersey,
             id: player?.id || Date.now().toString()
@@ -178,34 +178,38 @@ export default function Modal({ player, onSave, onClose, isNew, allPlayers }) {
                 {/* Team Assignment */}
                 <div style={{ padding: "14px 24px 10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                        <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, letterSpacing: 1.5 }}>TEAM</label>
+                        <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, letterSpacing: 1.5 }}>TEAMS (select multiple)</label>
                         {teamAutoSet && age !== null && (
                             <span style={{ fontSize: 9, color: "rgba(52,152,219,0.7)", fontStyle: "italic" }}>auto-assigned by age ({age})</span>
                         )}
                     </div>
                     <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                        <button onClick={() => { setTeamId(""); setTeamAutoSet(false) }}
-                            style={{
-                                background: !teamId ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.04)",
-                                border: !teamId ? "1px solid rgba(255,255,255,0.25)" : "1px solid rgba(255,255,255,0.1)",
-                                borderRadius: 6, padding: "6px 12px",
-                                color: !teamId ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.35)",
-                                fontSize: 11, fontWeight: 600, cursor: "pointer"
-                            }}>Unassigned</button>
-                        {teams.map(t => (
-                            <button key={t.id} onClick={() => { setTeamId(t.id); setTeamAutoSet(false) }}
-                                style={{
-                                    background: teamId === t.id ? "rgba(52,152,219,0.2)" : "rgba(255,255,255,0.04)",
-                                    border: teamId === t.id ? "1px solid #3498db" : "1px solid rgba(255,255,255,0.1)",
-                                    borderRadius: 6, padding: "6px 12px",
-                                    color: teamId === t.id ? "#3498db" : "rgba(255,255,255,0.35)",
-                                    fontSize: 11, fontWeight: 700, cursor: "pointer", letterSpacing: 0.3
-                                }}>
-                                {t.name}
-                                <span style={{ marginLeft: 4, opacity: 0.5, fontSize: 9 }}>{t.ageGroup}</span>
-                            </button>
-                        ))}
+                        {teams.map(t => {
+                            const sel = teamIds.includes(t.id)
+                            return (
+                                <button key={t.id} onClick={() => {
+                                    setTeamIds(prev => prev.includes(t.id) ? prev.filter(id => id !== t.id) : [...prev, t.id])
+                                    setTeamAutoSet(false)
+                                }}
+                                    style={{
+                                        background: sel ? "rgba(52,152,219,0.2)" : "rgba(255,255,255,0.04)",
+                                        border: sel ? "1px solid #3498db" : "1px solid rgba(255,255,255,0.1)",
+                                        borderRadius: 6, padding: "6px 12px",
+                                        color: sel ? "#3498db" : "rgba(255,255,255,0.35)",
+                                        fontSize: 11, fontWeight: 700, cursor: "pointer", letterSpacing: 0.3
+                                    }}>
+                                    {t.name}
+                                    <span style={{ marginLeft: 4, opacity: 0.5, fontSize: 9 }}>{t.ageGroup}</span>
+                                </button>
+                            )
+                        })}
+                        {teams.length === 0 && (
+                            <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 11, fontStyle: "italic" }}>No teams created yet — go to Manage Team → Teams & Seasons</span>
+                        )}
                     </div>
+                    {teamIds.length === 0 && teams.length > 0 && (
+                        <div style={{ color: "rgba(255,255,255,0.2)", fontSize: 10, marginTop: 6 }}>No team selected — player will show as unassigned</div>
+                    )}
                 </div>
 
                 {/* Position Selection */}
