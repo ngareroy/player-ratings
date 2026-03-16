@@ -13,7 +13,7 @@ export default function LoginPage() {
     const [isSetup, setIsSetup] = useState(false)
     const [checkingSetup, setCheckingSetup] = useState(true)
     const [submitting, setSubmitting] = useState(false)
-    const [accessDenied, setAccessDenied] = useState(false)
+    const [waitingForRole, setWaitingForRole] = useState(false)
 
     // Check if this is first-time setup (no admins exist yet)
     useEffect(() => {
@@ -32,35 +32,45 @@ export default function LoginPage() {
     // If already logged in as admin, redirect
     useEffect(() => {
         if (!loading && user && isAdmin) {
+            setWaitingForRole(false)
             navigate('/admin')
         }
-        if (!loading && user && !isAdmin) {
-            setAccessDenied(true)
-        }
     }, [user, isAdmin, loading, navigate])
+
+    // If we've been waiting for the role and loading finished with no admin, show denied
+    const showAccessDenied = !loading && !waitingForRole && user && !isAdmin && !checkingSetup && !submitting
+
+    // But give a grace period — only show denied after login has had time to resolve
+    const [deniedTimer, setDeniedTimer] = useState(false)
+    useEffect(() => {
+        if (user && !isAdmin && !loading) {
+            const t = setTimeout(() => setDeniedTimer(true), 1500)
+            return () => clearTimeout(t)
+        } else {
+            setDeniedTimer(false)
+        }
+    }, [user, isAdmin, loading])
+
+    const accessDenied = deniedTimer && !isAdmin && !submitting && !waitingForRole
 
     const handleEmailLogin = async () => {
         if (!email.trim() || !password.trim()) return
         setError("")
         setSubmitting(true)
+        setWaitingForRole(true)
         try {
             if (isSetup) {
-                if (!name.trim()) { setError("Please enter your name."); setSubmitting(false); return }
+                if (!name.trim()) { setError("Please enter your name."); setSubmitting(false); setWaitingForRole(false); return }
                 const cred = await registerWithEmail(email, password)
                 await setAdminRole(cred.user.uid, email, 'head_coach', name.trim())
                 window.location.reload()
+                return
             } else {
                 await loginWithEmail(email, password)
-                // Auth state change will handle redirect
-                // Brief wait then check role
-                setTimeout(async () => {
-                    const role = await getAdminRole((await import('../firebase')).auth.currentUser?.uid)
-                    if (!role) setAccessDenied(true)
-                    setSubmitting(false)
-                }, 1000)
-                return
+                // AuthContext will detect the user, load role, and the useEffect above will redirect
             }
         } catch (err) {
+            setWaitingForRole(false)
             if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
                 setError("Invalid email or password.")
             } else if (err.code === 'auth/email-already-in-use') {
@@ -77,6 +87,7 @@ export default function LoginPage() {
     const handleGoogleLogin = async () => {
         setError("")
         setSubmitting(true)
+        setWaitingForRole(true)
         try {
             const cred = await loginWithGoogle()
             if (isSetup) {
@@ -84,12 +95,9 @@ export default function LoginPage() {
                 window.location.reload()
                 return
             }
-            // Check if they're an admin
-            const role = await getAdminRole(cred.user.uid)
-            if (!role) {
-                setAccessDenied(true)
-            }
+            // AuthContext will detect the user, load role, and the useEffect above will redirect
         } catch (err) {
+            setWaitingForRole(false)
             if (err.code !== 'auth/popup-closed-by-user') {
                 setError(err.message)
             }
@@ -97,10 +105,21 @@ export default function LoginPage() {
         setSubmitting(false)
     }
 
-    if (loading || checkingSetup) {
+    const handleTryAnother = async () => {
+        setDeniedTimer(false)
+        setWaitingForRole(false)
+        const { logout } = await import('../firebase')
+        await logout()
+    }
+
+    if (loading || checkingSetup || waitingForRole) {
         return (
-            <div style={{ minHeight: "100vh", background: "#0a0a1a", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <p style={{ color: "rgba(255,255,255,0.4)", fontFamily: "system-ui", fontSize: 14 }}>Loading...</p>
+            <div style={{ minHeight: "100vh", background: "#0a0a1a", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 12 }}>
+                <div style={{ width: 36, height: 36, border: "3px solid rgba(255,255,255,0.08)", borderTopColor: "#2ecc40", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+                <p style={{ color: "rgba(255,255,255,0.4)", fontFamily: "system-ui", fontSize: 13 }}>
+                    {waitingForRole ? "Signing in..." : "Loading..."}
+                </p>
+                <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
             </div>
         )
     }
@@ -137,13 +156,13 @@ export default function LoginPage() {
                                 Signed in as {user?.email}
                             </p>
                             <div style={{ display: "flex", gap: 8 }}>
-                                <button onClick={() => { setAccessDenied(false); import('../firebase').then(f => f.logout()) }}
+                                <button onClick={handleTryAnother}
                                     style={{ flex: 1, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "10px 16px", color: "rgba(255,255,255,0.6)", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
                                     Try Another Account
                                 </button>
                                 <button onClick={() => navigate('/')}
                                     style={{ flex: 1, background: "rgba(46,204,64,0.1)", border: "1px solid rgba(46,204,64,0.2)", borderRadius: 10, padding: "10px 16px", color: "#2ecc40", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
-                                    Go to Public View
+                                    Go to Home
                                 </button>
                             </div>
                         </div>
@@ -228,7 +247,7 @@ export default function LoginPage() {
                                     fontSize: 12, fontWeight: 600, cursor: "pointer", marginTop: 8,
                                     letterSpacing: 0.5
                                 }}>
-                                ← Back to Public View
+                                ← Back to Home
                             </button>
                         </>
                     )}
