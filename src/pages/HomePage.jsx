@@ -155,7 +155,10 @@ export default function HomePage() {
             {/* Upcoming */}
             {upcomingMatches.length > 0 && (
               <>
-                <h2 style={{ color: "#fff", fontSize: 18, fontWeight: 800, margin: "0 0 14px", letterSpacing: 0.5 }}>Upcoming Fixtures</h2>
+                <h2 style={{ color: "#fff", fontSize: 18, fontWeight: 800, margin: "0 0 14px", letterSpacing: 0.5, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <span>Upcoming Fixtures</span>
+                  {matches.length > 3 && <button onClick={() => navigate('/fixtures')} style={{ background: "none", border: "none", color: pc, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>View all →</button>}
+                </h2>
                 {upcomingMatches.map(m => {
                   const team = teamMap[m.teamId]
                   return (
@@ -182,7 +185,10 @@ export default function HomePage() {
             {/* Recent Results */}
             {recentResults.length > 0 && (
               <>
-                <h2 style={{ color: "#fff", fontSize: 18, fontWeight: 800, margin: "20px 0 14px", letterSpacing: 0.5 }}>Recent Results</h2>
+                <h2 style={{ color: "#fff", fontSize: 18, fontWeight: 800, margin: "20px 0 14px", letterSpacing: 0.5, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <span>Recent Results</span>
+                  <button onClick={() => navigate('/fixtures')} style={{ background: "none", border: "none", color: pc, fontSize: 11, fontWeight: 600, cursor: "pointer" }}>View all →</button>
+                </h2>
                 {recentResults.map(m => {
                   const { r, c } = getResult(m)
                   const team = teamMap[m.teamId]
