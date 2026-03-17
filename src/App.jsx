@@ -39,6 +39,7 @@ export default function App() {
         <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/players" element={<PublicView />} />
+            <Route path="/fixtures" element={<PublicView />} />
             <Route path="/news/:postId" element={<NewsDetail />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/admin" element={

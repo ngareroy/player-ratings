@@ -70,7 +70,7 @@ export default function PublicView() {
                     <button onClick={() => navigate('/')} style={{ position: "absolute", left: 0, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "6px 14px", color: "rgba(255,255,255,0.25)", fontSize: 10, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
                         <span style={{ fontSize: 14 }}>{club.logoEmoji || "⚽"}</span> Home
                     </button>
-                    <h1 style={{ color: "#fff", fontSize: 26, fontWeight: 800, textAlign: "center", margin: 0, letterSpacing: 1 }}>PLAYER RATINGS</h1>
+                    <h1 style={{ color: "#fff", fontSize: 26, fontWeight: 800, textAlign: "center", margin: 0, letterSpacing: 1 }}>{club.clubName || "Hub FC"} RATINGS</h1>
                     <button onClick={() => navigate('/login')}
                         style={{ position: "absolute", right: 0, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "6px 14px", color: "rgba(255,255,255,0.25)", fontSize: 10, fontWeight: 600, cursor: "pointer", letterSpacing: 0.5 }}>
                         Coach Login
