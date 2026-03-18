@@ -103,47 +103,17 @@ export default function AdminView() {
     <div style={{ minHeight: "100vh", background: "#0a0a1a", padding: "20px 12px", fontFamily: "system-ui" }}>
       <div style={{ maxWidth: 1280, margin: "0 auto" }}>
 
-        {/* Top Bar */}
-        <div className="admin-topbar" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
+        {/* Top Bar — Row 1: Title + Profile + Logout (always visible) */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8, flexWrap: "wrap", gap: 8 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <h1 style={{ color: "#fff", fontSize: 22, fontWeight: 800, margin: 0, letterSpacing: 1 }}>{club.clubName || "Hub FC"} RATINGS</h1>
             <span style={{ background: "rgba(46,204,64,0.15)", color: "#2ecc40", fontSize: 9, fontWeight: 700, padding: "3px 8px", borderRadius: 6, letterSpacing: 1 }}>ADMIN</span>
           </div>
-          <div className="nav-buttons" style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            {isHeadCoach && (
-              <button onClick={() => navigate('/admin/manage')}
-                style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "7px 12px", color: "rgba(255,255,255,0.5)", fontSize: 10, fontWeight: 700, cursor: "pointer", letterSpacing: 0.5 }}>
-                Manage Team
-              </button>
-            )}
-            <button onClick={() => navigate('/admin/matches')}
-              style={{ background: "rgba(155,89,182,0.08)", border: "1px solid rgba(155,89,182,0.15)", borderRadius: 8, padding: "7px 12px", color: "rgba(155,89,182,0.7)", fontSize: 10, fontWeight: 700, cursor: "pointer", letterSpacing: 0.5 }}>
-              Matches
-            </button>
-            <button onClick={() => navigate('/admin/attendance')}
-              style={{ background: "rgba(52,152,219,0.08)", border: "1px solid rgba(52,152,219,0.15)", borderRadius: 8, padding: "7px 12px", color: "rgba(52,152,219,0.7)", fontSize: 10, fontWeight: 700, cursor: "pointer", letterSpacing: 0.5 }}>
-              Attendance
-            </button>
-            <button onClick={() => navigate('/compare')}
-              style={{ background: "rgba(255,170,0,0.08)", border: "1px solid rgba(255,170,0,0.15)", borderRadius: 8, padding: "7px 12px", color: "rgba(255,170,0,0.7)", fontSize: 10, fontWeight: 700, cursor: "pointer", letterSpacing: 0.5 }}>
-              Compare
-            </button>
-            <button onClick={() => navigate('/admin/awards')}
-              style={{ background: "rgba(255,170,0,0.06)", border: "1px solid rgba(255,170,0,0.12)", borderRadius: 8, padding: "7px 12px", color: "rgba(255,170,0,0.6)", fontSize: 10, fontWeight: 700, cursor: "pointer", letterSpacing: 0.5 }}>
-              Awards
-            </button>
-            <button onClick={() => navigate('/admin/formation')}
-              style={{ background: "rgba(46,204,64,0.06)", border: "1px solid rgba(46,204,64,0.12)", borderRadius: 8, padding: "7px 12px", color: "rgba(46,204,64,0.6)", fontSize: 10, fontWeight: 700, cursor: "pointer", letterSpacing: 0.5 }}>
-              Formation
-            </button>
-            <button onClick={() => navigate('/admin/scouting')}
-              style={{ background: "rgba(232,185,48,0.06)", border: "1px solid rgba(232,185,48,0.15)", borderRadius: 8, padding: "7px 12px", color: "rgba(232,185,48,0.7)", fontSize: 10, fontWeight: 700, cursor: "pointer", letterSpacing: 0.5 }}>
-              🔍 Scouting
-            </button>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
             {/* Profile Avatar */}
             <button onClick={() => setShowProfile(true)}
               style={{
-                display: "flex", alignItems: "center", gap: 10, padding: "4px 12px 4px 4px",
+                display: "flex", alignItems: "center", gap: 8, padding: "4px 10px 4px 4px",
                 background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
                 borderRadius: 12, cursor: "pointer", transition: "background 0.2s",
               }}
@@ -169,6 +139,40 @@ export default function AdminView() {
               Logout
             </button>
           </div>
+        </div>
+
+        {/* Top Bar — Row 2: Nav buttons (scrollable on mobile) */}
+        <div className="nav-buttons" style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+          {isHeadCoach && (
+            <button onClick={() => navigate('/admin/manage')}
+              style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "7px 12px", color: "rgba(255,255,255,0.5)", fontSize: 10, fontWeight: 700, cursor: "pointer", letterSpacing: 0.5, whiteSpace: "nowrap" }}>
+              Manage Team
+            </button>
+          )}
+          <button onClick={() => navigate('/admin/matches')}
+            style={{ background: "rgba(155,89,182,0.08)", border: "1px solid rgba(155,89,182,0.15)", borderRadius: 8, padding: "7px 12px", color: "rgba(155,89,182,0.7)", fontSize: 10, fontWeight: 700, cursor: "pointer", letterSpacing: 0.5, whiteSpace: "nowrap" }}>
+            Matches
+          </button>
+          <button onClick={() => navigate('/admin/attendance')}
+            style={{ background: "rgba(52,152,219,0.08)", border: "1px solid rgba(52,152,219,0.15)", borderRadius: 8, padding: "7px 12px", color: "rgba(52,152,219,0.7)", fontSize: 10, fontWeight: 700, cursor: "pointer", letterSpacing: 0.5, whiteSpace: "nowrap" }}>
+            Attendance
+          </button>
+          <button onClick={() => navigate('/compare')}
+            style={{ background: "rgba(255,170,0,0.08)", border: "1px solid rgba(255,170,0,0.15)", borderRadius: 8, padding: "7px 12px", color: "rgba(255,170,0,0.7)", fontSize: 10, fontWeight: 700, cursor: "pointer", letterSpacing: 0.5, whiteSpace: "nowrap" }}>
+            Compare
+          </button>
+          <button onClick={() => navigate('/admin/awards')}
+            style={{ background: "rgba(255,170,0,0.06)", border: "1px solid rgba(255,170,0,0.12)", borderRadius: 8, padding: "7px 12px", color: "rgba(255,170,0,0.6)", fontSize: 10, fontWeight: 700, cursor: "pointer", letterSpacing: 0.5, whiteSpace: "nowrap" }}>
+            Awards
+          </button>
+          <button onClick={() => navigate('/admin/formation')}
+            style={{ background: "rgba(46,204,64,0.06)", border: "1px solid rgba(46,204,64,0.12)", borderRadius: 8, padding: "7px 12px", color: "rgba(46,204,64,0.6)", fontSize: 10, fontWeight: 700, cursor: "pointer", letterSpacing: 0.5, whiteSpace: "nowrap" }}>
+            Formation
+          </button>
+          <button onClick={() => navigate('/admin/scouting')}
+            style={{ background: "rgba(232,185,48,0.06)", border: "1px solid rgba(232,185,48,0.15)", borderRadius: 8, padding: "7px 12px", color: "rgba(232,185,48,0.7)", fontSize: 10, fontWeight: 700, cursor: "pointer", letterSpacing: 0.5, whiteSpace: "nowrap" }}>
+            🔍 Scouting
+          </button>
         </div>
 
         <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, textAlign: "center", margin: "0 0 8px", letterSpacing: 2 }}>
