@@ -35,6 +35,7 @@ export default function FormationBuilder() {
     const [slots, setSlots] = useState(Array(11).fill(null))
     const [search, setSearch] = useState("")
     const [dragIdx, setDragIdx] = useState(null)
+    const [selectedPlayer, setSelectedPlayer] = useState(null) // for tap-to-assign on mobile
 
     useEffect(() => {
         const u1 = subscribePlayers(setPlayers)
@@ -72,6 +73,17 @@ export default function FormationBuilder() {
 
     const removeFromSlot = (slotIdx) => {
         setSlots(prev => { const n = [...prev]; n[slotIdx] = null; return n })
+    }
+
+    const handleSlotClick = (i, sr) => {
+        if (selectedPlayer) {
+            // Tap-to-assign: place selected player in this slot
+            assignPlayer(i, selectedPlayer)
+            setSelectedPlayer(null)
+        } else if (sr) {
+            // No selection active: tap a filled slot to remove
+            removeFromSlot(i)
+        }
     }
 
     const getSlotRating = (slotIdx) => {
@@ -164,11 +176,11 @@ export default function FormationBuilder() {
                             <div style={{ position: "absolute", top: 0, left: "25%", right: "25%", height: "16%", border: "1px solid rgba(255,255,255,0.1)", borderTop: "none", borderRadius: "0 0 6px 6px" }} />
                             <div style={{ position: "absolute", bottom: 0, left: "25%", right: "25%", height: "16%", border: "1px solid rgba(255,255,255,0.1)", borderBottom: "none", borderRadius: "6px 6px 0 0" }} />
 
-                            {/* Slots */}
-                            {formationData.slots.map((pos, i) => {
+                            {/* Slots */}                            {formationData.slots.map((pos, i) => {
                                 const coord = slotPositions[i]
                                 const sr = getSlotRating(i)
                                 const isEmpty = !sr
+                                const isTargeted = !!selectedPlayer  // waiting to be placed
 
                                 return (
                                     <div key={i}
@@ -178,23 +190,27 @@ export default function FormationBuilder() {
                                             e.preventDefault()
                                             e.currentTarget.style.transform = "translate(-50%,-50%) scale(1)"
                                             const pid = e.dataTransfer.getData("playerId")
-                                            if (pid) assignPlayer(i, pid)
+                                            if (pid) { assignPlayer(i, pid); setSelectedPlayer(null) }
                                         }}
-                                        onClick={() => { if (sr) removeFromSlot(i) }}
+                                        onClick={() => handleSlotClick(i, sr)}
                                         style={{
                                             position: "absolute",
                                             left: `${coord.x}%`, top: `${coord.y}%`,
                                             transform: "translate(-50%,-50%)",
                                             width: isEmpty ? 44 : 52, minHeight: isEmpty ? 44 : 56,
                                             borderRadius: 10,
-                                            background: isEmpty ? "rgba(255,255,255,0.06)" : `${getRatingColor(sr.rating)}15`,
-                                            border: isEmpty ? "2px dashed rgba(255,255,255,0.12)" : `2px solid ${getRatingColor(sr.rating)}55`,
+                                            background: isEmpty
+                                                ? (isTargeted ? "rgba(255,170,0,0.1)" : "rgba(255,255,255,0.06)")
+                                                : `${getRatingColor(sr.rating)}15`,
+                                            border: isEmpty
+                                                ? (isTargeted ? "2px dashed rgba(255,170,0,0.5)" : "2px dashed rgba(255,255,255,0.12)")
+                                                : `2px solid ${getRatingColor(sr.rating)}55`,
                                             display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-                                            cursor: sr ? "pointer" : "default",
+                                            cursor: (isTargeted || sr) ? "pointer" : "default",
                                             transition: "all 0.2s",
                                             padding: "3px 2px",
                                         }}
-                                        title={sr ? `${sr.player.name} — ${sr.rating} as ${pos} (click to remove)` : `Drop player for ${pos}`}
+                                        title={sr ? `${sr.player.name} — ${sr.rating} as ${pos} (tap/click to remove)` : isTargeted ? `Tap to place here` : `Drop or tap player for ${pos}`}
                                     >
                                         {sr ? (
                                             <>
@@ -203,11 +219,11 @@ export default function FormationBuilder() {
                                                 <div style={{ fontSize: 7, fontWeight: 700, color: "rgba(255,255,255,0.35)", marginTop: 1 }}>{pos}</div>
                                             </>
                                         ) : (
-                                            <div style={{ fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.2)" }}>{pos}</div>
+                                            <div style={{ fontSize: 9, fontWeight: 700, color: isTargeted ? "rgba(255,170,0,0.6)" : "rgba(255,255,255,0.2)" }}>{pos}</div>
                                         )}
                                     </div>
                                 )
-                            })}
+            })}
                         </div>
                     </div>
 
@@ -235,31 +251,49 @@ export default function FormationBuilder() {
                                 </div>
                             </div>
 
+                            {/* Tap-to-assign banner */}
+                            {selectedPlayer && (() => {
+                                const sp = players.find(p => p.id === selectedPlayer)
+                                return sp ? (
+                                    <div style={{ padding: "8px 16px", background: "rgba(255,170,0,0.12)", borderBottom: "1px solid rgba(255,170,0,0.2)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                                        <span style={{ color: "#ffaa00", fontSize: 11, fontWeight: 700 }}>{sp.name} — tap a slot to place</span>
+                                        <button onClick={() => setSelectedPlayer(null)}
+                                            style={{ background: "rgba(255,255,255,0.08)", border: "none", borderRadius: 6, padding: "4px 10px", color: "rgba(255,255,255,0.5)", fontSize: 10, fontWeight: 700, cursor: "pointer" }}>
+                                            Cancel
+                                        </button>
+                                    </div>
+                                ) : null
+                            })()}
                             <div style={{ maxHeight: 500, overflow: "auto" }}>
                                 {availablePlayers.map(p => {
                                     const ovr = Math.round(calcOverall(p))
+                                    const isSelected = selectedPlayer === p.id
                                     return (
                                         <div key={p.id} draggable
-                                            onDragStart={e => { e.dataTransfer.setData("playerId", p.id); setDragIdx(p.id) }}
+                                            onDragStart={e => { e.dataTransfer.setData("playerId", p.id); setDragIdx(p.id); setSelectedPlayer(null) }}
                                             onDragEnd={() => setDragIdx(null)}
+                                            onClick={() => setSelectedPlayer(prev => prev === p.id ? null : p.id)}
                                             style={{
-                                                padding: "8px 16px", display: "flex", alignItems: "center", gap: 10,
+                                                padding: "10px 16px", display: "flex", alignItems: "center", gap: 10,
                                                 borderBottom: "1px solid rgba(255,255,255,0.02)",
-                                                cursor: "grab", opacity: dragIdx === p.id ? 0.4 : 1,
-                                                transition: "opacity 0.2s",
+                                                cursor: "pointer", opacity: dragIdx === p.id ? 0.4 : 1,
+                                                transition: "background 0.15s, opacity 0.2s",
+                                                background: isSelected ? "rgba(255,170,0,0.08)" : "transparent",
+                                                borderLeft: isSelected ? "3px solid #ffaa00" : "3px solid transparent",
                                             }}
-                                            onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.03)"}
-                                            onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                                            onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = "rgba(255,255,255,0.03)" }}
+                                            onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = "transparent" }}
                                         >
                                             <div style={{ width: 28, height: 28, borderRadius: 6, background: getOvrBg(ovr), display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 800, color: "#fff", flexShrink: 0 }}>{ovr}</div>
                                             <div style={{ flex: 1, minWidth: 0 }}>
-                                                <div style={{ color: "#fff", fontSize: 12, fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</div>
+                                                <div style={{ color: isSelected ? "#ffaa00" : "#fff", fontSize: 12, fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</div>
                                                 <div style={{ display: "flex", gap: 3, marginTop: 1 }}>
                                                     {(p.positions || []).slice(0, 4).map(pos => (
                                                         <span key={pos} style={{ fontSize: 7, fontWeight: 700, color: pos === "GK" ? "#ffaa00" : "rgba(255,255,255,0.2)" }}>{pos}</span>
                                                     ))}
                                                 </div>
                                             </div>
+                                            {isSelected && <span style={{ fontSize: 9, color: "#ffaa00", fontWeight: 700 }}>→ TAP SLOT</span>}
                                         </div>
                                     )
                                 })}
@@ -271,6 +305,7 @@ export default function FormationBuilder() {
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>

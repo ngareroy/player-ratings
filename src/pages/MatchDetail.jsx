@@ -166,8 +166,10 @@ export default function MatchDetail() {
             </button>
           </div>
 
+          {/* Stat Table — horizontally scrollable on mobile */}
+          <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
           {/* Stat Headers */}
-          <div style={{ display: "flex", alignItems: "center", padding: "8px 20px", borderBottom: "1px solid rgba(255,255,255,0.04)", gap: 4 }}>
+          <div style={{ display: "flex", alignItems: "center", padding: "8px 20px", borderBottom: "1px solid rgba(255,255,255,0.04)", gap: 4, minWidth: 560 }}>
             <div style={{ width: 28 }} />
             <div style={{ width: 120, color: "rgba(255,255,255,0.2)", fontSize: 9, fontWeight: 700, letterSpacing: 1 }}>PLAYER</div>
             {STAT_FIELDS.map(f => (
@@ -185,7 +187,8 @@ export default function MatchDetail() {
                 display: "flex", alignItems: "center", padding: "8px 20px", gap: 4,
                 borderBottom: "1px solid rgba(255,255,255,0.02)",
                 opacity: inSquad ? 1 : 0.4, transition: "opacity 0.2s",
-                background: inSquad ? "rgba(255,255,255,0.01)" : "transparent"
+                background: inSquad ? "rgba(255,255,255,0.01)" : "transparent",
+                minWidth: 560
               }}>
                 {/* Toggle */}
                 <button onClick={() => toggleSquad(player.id)}
@@ -244,6 +247,7 @@ export default function MatchDetail() {
               <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 12 }}>No players assigned to this team yet. Assign players via the admin panel.</p>
             </div>
           )}
+          </div>{/* end overflow-x scroll wrapper */}
         </div>
 
         {/* Squad Summary */}

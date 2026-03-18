@@ -111,7 +111,7 @@ function TrialModal({ trial, onSave, onClose, coachName }) {
                             <button key={p} onClick={() => togglePos(p)} style={{
                                 background: positions.includes(p) ? "rgba(46,204,64,0.15)" : "rgba(255,255,255,0.04)",
                                 border: positions.includes(p) ? "1px solid #2ecc40" : "1px solid rgba(255,255,255,0.08)",
-                                borderRadius: 5, padding: "4px 8px", color: positions.includes(p) ? "#2ecc40" : "rgba(255,255,255,0.3)",
+                                borderRadius: 5, padding: "6px 10px", color: positions.includes(p) ? "#2ecc40" : "rgba(255,255,255,0.3)",
                                 fontSize: 9, fontWeight: 700, cursor: "pointer"
                             }}>{p}</button>
                         ))}
@@ -126,7 +126,7 @@ function TrialModal({ trial, onSave, onClose, coachName }) {
                             <button key={v} onClick={() => setVerdict(v)} style={{
                                 background: verdict === v ? `${VERDICT_COLORS[v]}22` : "rgba(255,255,255,0.04)",
                                 border: verdict === v ? `1px solid ${VERDICT_COLORS[v]}` : "1px solid rgba(255,255,255,0.08)",
-                                borderRadius: 6, padding: "6px 14px", color: verdict === v ? VERDICT_COLORS[v] : "rgba(255,255,255,0.3)",
+                                borderRadius: 6, padding: "8px 16px", color: verdict === v ? VERDICT_COLORS[v] : "rgba(255,255,255,0.3)",
                                 fontSize: 11, fontWeight: 700, cursor: "pointer"
                             }}>{v}</button>
                         ))}
@@ -295,11 +295,11 @@ export default function ScoutingPage() {
                                     {isHeadCoach && (
                                         confirmDelete === trial.id ? (
                                             <div style={{ display: "flex", gap: 3 }}>
-                                                <button onClick={() => handleDelete(trial.id)} style={{ background: "rgba(231,76,60,0.15)", border: "1px solid rgba(231,76,60,0.3)", borderRadius: 6, padding: "5px 7px", color: "#e74c3c", fontSize: 8, fontWeight: 700, cursor: "pointer" }}>Yes</button>
-                                                <button onClick={() => setConfirmDelete(null)} style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6, padding: "5px 7px", color: "rgba(255,255,255,0.3)", fontSize: 8, cursor: "pointer" }}>No</button>
+                                                <button onClick={() => handleDelete(trial.id)} style={{ background: "rgba(231,76,60,0.15)", border: "1px solid rgba(231,76,60,0.3)", borderRadius: 6, padding: "7px 10px", color: "#e74c3c", fontSize: 8, fontWeight: 700, cursor: "pointer" }}>Yes</button>
+                                                <button onClick={() => setConfirmDelete(null)} style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6, padding: "7px 10px", color: "rgba(255,255,255,0.3)", fontSize: 8, cursor: "pointer" }}>No</button>
                                             </div>
                                         ) : (
-                                            <button onClick={() => setConfirmDelete(trial.id)} style={{ background: "rgba(231,76,60,0.04)", border: "1px solid rgba(231,76,60,0.08)", borderRadius: 6, padding: "5px 7px", color: "rgba(231,76,60,0.4)", fontSize: 10, cursor: "pointer" }}>✕</button>
+                                            <button onClick={() => setConfirmDelete(trial.id)} style={{ background: "rgba(231,76,60,0.04)", border: "1px solid rgba(231,76,60,0.08)", borderRadius: 6, padding: "7px 10px", color: "rgba(231,76,60,0.4)", fontSize: 10, cursor: "pointer", minHeight: 36 }}>✕</button>
                                         )
                                     )}
                                 </div>

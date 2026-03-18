@@ -104,12 +104,12 @@ export default function AdminView() {
       <div style={{ maxWidth: 1280, margin: "0 auto" }}>
 
         {/* Top Bar */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
+        <div className="admin-topbar" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <h1 style={{ color: "#fff", fontSize: 22, fontWeight: 800, margin: 0, letterSpacing: 1 }}>{club.clubName || "Hub FC"} RATINGS</h1>
             <span style={{ background: "rgba(46,204,64,0.15)", color: "#2ecc40", fontSize: 9, fontWeight: 700, padding: "3px 8px", borderRadius: 6, letterSpacing: 1 }}>ADMIN</span>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div className="nav-buttons" style={{ display: "flex", alignItems: "center", gap: 10 }}>
             {isHeadCoach && (
               <button onClick={() => navigate('/admin/manage')}
                 style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "7px 12px", color: "rgba(255,255,255,0.5)", fontSize: 10, fontWeight: 700, cursor: "pointer", letterSpacing: 0.5 }}>
