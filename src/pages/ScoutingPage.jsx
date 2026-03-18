@@ -2,10 +2,12 @@ import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { subscribeTrials, saveTrial, removeTrial, convertTrialToPlayer, subscribeTeams, subscribeClubSettings } from '../firebase'
-import { ATTRS, GK_ATTRS, CAT_ORDER, CAT_FORMULAS, calcCategories, calcGkCategory, calcOverall, getRatingColor, getOvrBg } from '../utils'
+import { ATTRS, GK_ATTRS, CAT_ORDER, CAT_FORMULAS, calcCategories, calcOverall, getRatingColor, getOvrBg } from '../utils'
 
 const VERDICTS = ["Pending", "Sign", "Reject", "Callback"]
 const VERDICT_COLORS = { Pending: "rgba(255,255,255,0.3)", Sign: "#2ecc40", Reject: "#e74c3c", Callback: "#e8b930" }
+
+const ALL_POSITIONS = ["GK", "CB", "LB", "RB", "CDM", "CM", "CAM", "LM", "RM", "LW", "RW", "ST"]
 
 function TrialModal({ trial, teams, onSave, onClose, coachName }) {
     const [name, setName] = useState(trial?.name || "")
@@ -46,7 +48,23 @@ function TrialModal({ trial, teams, onSave, onClose, coachName }) {
                         <button onClick={onClose} style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, padding: "8px 16px", color: "rgba(255,255,255,0.5)", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Cancel</button>
                         <button onClick={() => {
                             if (!name.trim()) return
-                            onSave({ ...trial, ...attrs, id: trial?.id || Date.now().toString(), name: name.trim(), dob, trialDate, source, parentContact, positions, trialNotes, verdict, status: trial?.status || 'active', scoutedBy: trial?.scoutedBy || coachName, createdAt: trial?.createdAt || new Date().toISOString() })
+                            onSave({
+                                ...trial,
+                                ...attrs,
+                                id: trial?.id || Date.now().toString(),
+                                name: name.trim(),
+                                dob,
+                                trialDate,
+                                source,
+                                parentContact,
+                                positions,
+                                trialNotes,
+                                verdict,
+                                // ✅ FIX: always ensure status is explicitly 'active' for new trials
+                                status: trial?.status || 'active',
+                                scoutedBy: trial?.scoutedBy || coachName,
+                                createdAt: trial?.createdAt || new Date().toISOString()
+                            })
                         }} style={{ background: "linear-gradient(135deg,#1a6b1a,#2ecc40)", border: "none", borderRadius: 8, padding: "8px 20px", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer", opacity: name.trim() ? 1 : 0.4 }}>
                             {isNew ? "Add Trial" : "Save"}
                         </button>
@@ -89,7 +107,7 @@ function TrialModal({ trial, teams, onSave, onClose, coachName }) {
                 <div style={{ marginBottom: 14 }}>
                     <label style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 600, display: "block", marginBottom: 6 }}>POSITIONS</label>
                     <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
-                        {["GK", "CB", "LB", "RB", "CDM", "CM", "CAM", "LM", "RM", "LW", "RW", "ST"].map(p => (
+                        {ALL_POSITIONS.map(p => (
                             <button key={p} onClick={() => togglePos(p)} style={{
                                 background: positions.includes(p) ? "rgba(46,204,64,0.15)" : "rgba(255,255,255,0.04)",
                                 border: positions.includes(p) ? "1px solid #2ecc40" : "1px solid rgba(255,255,255,0.08)",
@@ -132,7 +150,7 @@ function TrialModal({ trial, teams, onSave, onClose, coachName }) {
                     ))}
                 </div>
 
-                {/* Attribute Sliders */}
+                {/* Attribute Sliders — Outfield */}
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: "10px 24px" }}>
                     {CAT_ORDER.map(c => (
                         <div key={c}>
@@ -150,6 +168,25 @@ function TrialModal({ trial, teams, onSave, onClose, coachName }) {
                         </div>
                     ))}
                 </div>
+
+                {/* ✅ FIX: GK Attributes — only shown when GK position is selected */}
+                {hasGK && GK_ATTRS.length > 0 && (
+                    <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+                        <div style={{ fontSize: 9, fontWeight: 700, color: "#3498db", letterSpacing: 1, marginBottom: 8 }}>
+                            <span style={{ background: "rgba(52,152,219,0.1)", borderRadius: 3, padding: "1px 5px" }}>GK ATTRIBUTES</span>
+                        </div>
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: "4px 24px" }}>
+                            {GK_ATTRS.map(a => (
+                                <div key={a.key} style={{ display: "flex", alignItems: "center", gap: 6, padding: "2px 0" }}>
+                                    <span style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", width: 110, flexShrink: 0 }}>{a.label}</span>
+                                    <input type="range" min={0} max={99} value={attrs[a.key]} onChange={e => setAttr(a.key, parseInt(e.target.value))}
+                                        style={{ flex: 1, accentColor: getRatingColor(attrs[a.key]), height: 3, cursor: "pointer" }} />
+                                    <span style={{ fontSize: 12, fontWeight: 800, color: getRatingColor(attrs[a.key]), width: 22, textAlign: "right" }}>{attrs[a.key]}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     )
