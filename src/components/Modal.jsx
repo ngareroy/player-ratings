@@ -6,7 +6,7 @@ import {
     calcAge, suggestTeam,
     getRatingColor, getOvrBg
 } from '../utils'
-import { subscribeTeams } from '../firebase'
+import { subscribeTeams, savePlayerAccessCode, subscribeAccessCodes } from '../firebase'
 
 function AttrSlider({ attr, value, onChange, disabled }) {
     const color = disabled ? "rgba(255,255,255,0.15)" : getRatingColor(value)
@@ -37,6 +37,8 @@ export default function Modal({ player, onSave, onClose, isNew, allPlayers }) {
     const [positions, setPositions] = useState(player?.positions || [])
     const [jerseyNumber, setJerseyNumber] = useState(player?.jerseyNumber || "")
     const [gkJerseyNumber, setGkJerseyNumber] = useState(player?.gkJerseyNumber || "")
+    const [accessCode, setAccessCode] = useState("")
+    const [accessCodes, setAccessCodes] = useState({})
     const [error, setError] = useState("")
     const [attrs, setAttrs] = useState(() => {
         const a = {}
@@ -48,7 +50,11 @@ export default function Modal({ player, onSave, onClose, isNew, allPlayers }) {
 
     useEffect(() => {
         const unsub = subscribeTeams(setTeams)
-        return () => unsub()
+        const unsub2 = subscribeAccessCodes(codes => {
+            setAccessCodes(codes)
+            if (player?.id && codes[player.id]) setAccessCode(codes[player.id])
+        })
+        return () => { unsub(); unsub2() }
     }, [])
 
     // Auto-assign team when DOB changes (only if not manually set)
@@ -211,6 +217,26 @@ export default function Modal({ player, onSave, onClose, isNew, allPlayers }) {
                         <div style={{ color: "rgba(255,255,255,0.2)", fontSize: 10, marginTop: 6 }}>No team selected — player will show as unassigned</div>
                     )}
                 </div>
+
+                {/* Access Code for Self-Assessment */}
+                {!isNew && player?.id && (
+                    <div style={{ padding: "10px 24px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                        <span style={{ fontSize: 10, fontWeight: 600, color: "rgba(255,255,255,0.4)" }}>Self-Assessment Code:</span>
+                        {accessCode ? (
+                            <span style={{ fontSize: 14, fontWeight: 800, color: "#ffaa00", letterSpacing: 3, fontFamily: "monospace" }}>{accessCode}</span>
+                        ) : (
+                            <button onClick={async () => {
+                                const code = Math.random().toString(36).substring(2, 8).toUpperCase()
+                                await savePlayerAccessCode(player.id, code)
+                                setAccessCode(code)
+                            }}
+                                style={{ background: "rgba(255,170,0,0.08)", border: "1px solid rgba(255,170,0,0.15)", borderRadius: 6, padding: "5px 12px", color: "#ffaa00", fontSize: 10, fontWeight: 700, cursor: "pointer" }}>
+                                Generate Code
+                            </button>
+                        )}
+                        {accessCode && <span style={{ fontSize: 9, color: "rgba(255,255,255,0.2)" }}>Player uses this at /self-assess</span>}
+                    </div>
+                )}
 
                 {/* Position Selection */}
                 <div style={{ padding: "14px 24px 10px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>

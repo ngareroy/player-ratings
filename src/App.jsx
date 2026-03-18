@@ -16,6 +16,7 @@ import AttendancePage from './pages/AttendancePage'
 import TrainingDetail from './pages/TrainingDetail'
 import ComparePlayers from './pages/ComparePlayers'
 import AwardsPage from './pages/AwardsPage'
+import SelfAssessPage from './pages/SelfAssessPage'
 
 function ProtectedRoute({ children, requireHeadCoach }) {
   const { user, isAdmin, isHeadCoach, loading } = useAuth()
@@ -39,6 +40,7 @@ export default function App() {
       <Route path="/fixtures" element={<PublicFixtures />} />
       <Route path="/news/:postId" element={<NewsDetail />} />
       <Route path="/compare" element={<ComparePlayers />} />
+      <Route path="/self-assess" element={<SelfAssessPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/admin" element={<ProtectedRoute><AdminView /></ProtectedRoute>} />
       <Route path="/admin/manage" element={<ProtectedRoute requireHeadCoach><ManageTeam /></ProtectedRoute>} />

@@ -134,6 +134,47 @@ export function subscribeSeasons(callback) {
     })
 }
 
+// ============ SELF ASSESSMENTS ============
+
+const selfAssessRef = collection(db, 'selfAssessments')
+
+export async function saveSelfAssessment(assessment) {
+    await setDoc(doc(db, 'selfAssessments', assessment.id), assessment)
+}
+
+export function subscribePlayerSelfAssessments(playerId, callback) {
+    return onSnapshot(
+        query(selfAssessRef, where('playerId', '==', playerId)),
+        (snapshot) => {
+            const list = snapshot.docs.map(d => d.data()).sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt))
+            callback(list)
+        }
+    )
+}
+
+// ============ PLAYER ACCESS CODES ============
+
+export async function savePlayerAccessCode(playerId, code) {
+    await setDoc(doc(db, 'accessCodes', code), { playerId, code, createdAt: new Date().toISOString() })
+}
+
+export async function getPlayerByAccessCode(code) {
+    const snap = await getDoc(doc(db, 'accessCodes', code))
+    if (!snap.exists()) return null
+    const { playerId } = snap.data()
+    const playerSnap = await getDoc(doc(db, 'players', playerId))
+    if (!playerSnap.exists()) return null
+    return { id: playerSnap.id, ...playerSnap.data() }
+}
+
+export function subscribeAccessCodes(callback) {
+    return onSnapshot(collection(db, 'accessCodes'), (snapshot) => {
+        const map = {}
+        snapshot.docs.forEach(d => { const data = d.data(); map[data.playerId] = data.code })
+        callback(map)
+    })
+}
+
 // ============ AWARDS ============
 
 const awardsRef = collection(db, 'awards')

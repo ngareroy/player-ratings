@@ -6,6 +6,7 @@ import PlayerMatchStats from './PlayerMatchStats'
 import PlayerAttendance from './PlayerAttendance'
 import PlayerTrainingNotes from './PlayerTrainingNotes'
 import PlayerAwards from './PlayerAwards'
+import SelfAssessCompare from './SelfAssessCompare'
 import ReportButton from './ReportButton'
 import {
   ATTRS, GK_ATTRS, CAT_ORDER, CAT_FORMULAS, CAT_LABELS,
@@ -188,6 +189,12 @@ export default function PlayerDetailModal({ player, rank, onClose, teamNames }) 
         <div style={{ padding: "16px 24px 8px", borderTop: "1px solid rgba(255,255,255,0.04)" }}>
           <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.3)", letterSpacing: 2, marginBottom: 10 }}>TRAINING NOTES</div>
           <PlayerTrainingNotes playerId={player.id} />
+        </div>
+
+        {/* Self-Assessment Comparison */}
+        <div style={{ padding: "16px 24px 8px", borderTop: "1px solid rgba(255,255,255,0.04)" }}>
+          <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.3)", letterSpacing: 2, marginBottom: 10 }}>SELF-ASSESSMENT</div>
+          <SelfAssessCompare player={player} />
         </div>
 
         {/* All Attributes by Category */}

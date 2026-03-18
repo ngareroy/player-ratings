@@ -61,6 +61,7 @@ export default function HomePage() {
         <div style={{ display: "flex", gap: 6 }}>
           <button onClick={() => navigate('/players')} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "7px 14px", color: "rgba(255,255,255,0.5)", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>Player Ratings</button>
           <button onClick={() => navigate('/compare')} style={{ background: "rgba(255,170,0,0.04)", border: "1px solid rgba(255,170,0,0.1)", borderRadius: 8, padding: "7px 14px", color: "rgba(255,170,0,0.5)", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>Compare</button>
+          <button onClick={() => navigate('/self-assess')} style={{ background: "rgba(52,152,219,0.04)", border: "1px solid rgba(52,152,219,0.1)", borderRadius: 8, padding: "7px 14px", color: "rgba(52,152,219,0.5)", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>Self-Assess</button>
           <button onClick={() => navigate('/login')} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 8, padding: "7px 14px", color: "rgba(255,255,255,0.2)", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>Coach Login</button>
         </div>
       </div>
