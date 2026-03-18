@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import RadarChart from './RadarChart'
 import MiniPitch from './MiniPitch'
 import ProgressChart from './ProgressChart'
@@ -11,6 +12,7 @@ import {
 } from '../utils'
 
 export default function PlayerDetailModal({ player, rank, onClose, teamNames }) {
+  const navigate = useNavigate()
   const cats = calcCategories(player)
   const positions = player.positions || []
   const posRatings = calcAllPositionRatings(player)
@@ -33,6 +35,11 @@ export default function PlayerDetailModal({ player, rank, onClose, teamNames }) 
         {/* Header */}
         <div style={{ padding: "24px 28px 20px", background: "linear-gradient(180deg, rgba(46,204,64,0.08) 0%, transparent 100%)", borderBottom: "1px solid rgba(255,255,255,0.06)", position: "relative" }}>
           <div style={{ position: "absolute", top: 16, right: 16, display: "flex", gap: 8, alignItems: "center" }}>
+            <button onClick={() => { onClose(); navigate(`/compare?ids=${player.id}`) }}
+              style={{ background: "rgba(255,170,0,0.08)", border: "1px solid rgba(255,170,0,0.2)", borderRadius: 8, padding: "8px 14px", color: "#ffaa00", fontSize: 11, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 5, letterSpacing: 0.5 }}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /></svg>
+              Compare
+            </button>
             <ReportButton player={player} teamNames={teamNames} />
             <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "none", borderRadius: 8, width: 32, height: 32, cursor: "pointer", color: "rgba(255,255,255,0.5)", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
           </div>

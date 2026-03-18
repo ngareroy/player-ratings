@@ -13,10 +13,10 @@ import MatchDetail from './pages/MatchDetail'
 import ClubSettings from './pages/ClubSettings'
 import NewsDetail from './pages/NewsDetail'
 import AttendancePage from './pages/AttendancePage'
+import ComparePlayers from './pages/ComparePlayers'
 
 function ProtectedRoute({ children, requireHeadCoach }) {
   const { user, isAdmin, isHeadCoach, loading } = useAuth()
-
   if (loading) {
     return (
       <div style={{ minHeight: "100vh", background: "#0a0a1a", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -24,7 +24,6 @@ function ProtectedRoute({ children, requireHeadCoach }) {
       </div>
     )
   }
-
   if (!user || !isAdmin) return <Navigate to="/login" replace />
   if (requireHeadCoach && !isHeadCoach) return <Navigate to="/admin" replace />
   return children
@@ -37,6 +36,7 @@ export default function App() {
       <Route path="/players" element={<PublicView />} />
       <Route path="/fixtures" element={<PublicFixtures />} />
       <Route path="/news/:postId" element={<NewsDetail />} />
+      <Route path="/compare" element={<ComparePlayers />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/admin" element={<ProtectedRoute><AdminView /></ProtectedRoute>} />
       <Route path="/admin/manage" element={<ProtectedRoute requireHeadCoach><ManageTeam /></ProtectedRoute>} />

@@ -23,21 +23,21 @@ export default function HomePage() {
 
   const publishedNews = useMemo(() =>
     [...news].filter(n => n.published).sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 6)
-  , [news])
+    , [news])
 
   const recentResults = useMemo(() =>
     [...matches]
       .filter(m => m.goalsFor !== null && m.goalsFor !== undefined)
       .sort((a, b) => b.date.localeCompare(a.date))
       .slice(0, 5)
-  , [matches])
+    , [matches])
 
   const upcomingMatches = useMemo(() =>
     [...matches]
       .filter(m => m.date >= todayStr && (m.goalsFor === null || m.goalsFor === undefined))
       .sort((a, b) => a.date.localeCompare(b.date))
       .slice(0, 3)
-  , [matches, todayStr])
+    , [matches, todayStr])
 
   const teamMap = useMemo(() => { const m = {}; teams.forEach(t => m[t.id] = t); return m }, [teams])
 
@@ -60,6 +60,7 @@ export default function HomePage() {
         </div>
         <div style={{ display: "flex", gap: 6 }}>
           <button onClick={() => navigate('/players')} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "7px 14px", color: "rgba(255,255,255,0.5)", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>Player Ratings</button>
+          <button onClick={() => navigate('/compare')} style={{ background: "rgba(255,170,0,0.04)", border: "1px solid rgba(255,170,0,0.1)", borderRadius: 8, padding: "7px 14px", color: "rgba(255,170,0,0.5)", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>Compare</button>
           <button onClick={() => navigate('/login')} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 8, padding: "7px 14px", color: "rgba(255,255,255,0.2)", fontSize: 11, fontWeight: 600, cursor: "pointer" }}>Coach Login</button>
         </div>
       </div>

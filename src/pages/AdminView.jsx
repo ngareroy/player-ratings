@@ -122,6 +122,10 @@ export default function AdminView() {
               style={{ background: "rgba(52,152,219,0.08)", border: "1px solid rgba(52,152,219,0.15)", borderRadius: 8, padding: "7px 12px", color: "rgba(52,152,219,0.7)", fontSize: 10, fontWeight: 700, cursor: "pointer", letterSpacing: 0.5 }}>
               Attendance
             </button>
+            <button onClick={() => navigate('/compare')}
+              style={{ background: "rgba(255,170,0,0.08)", border: "1px solid rgba(255,170,0,0.15)", borderRadius: 8, padding: "7px 12px", color: "rgba(255,170,0,0.7)", fontSize: 10, fontWeight: 700, cursor: "pointer", letterSpacing: 0.5 }}>
+              Compare
+            </button>
             {/* Profile Avatar */}
             <button onClick={() => setShowProfile(true)}
               style={{

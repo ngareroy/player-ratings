@@ -31,7 +31,7 @@ export default function PublicView() {
       const best = positions.length > 0 ? calcBestRating(p) : calcOverall(p)
       return { ...p, cats: calcCategories(p), total: best }
     })
-  , [players])
+    , [players])
 
   const ranks = useMemo(() => {
     const s = [...enriched].sort((a, b) => b.total - a.total)
@@ -71,10 +71,16 @@ export default function PublicView() {
             <span style={{ fontSize: 14 }}>{club.logoEmoji || "⚽"}</span> Home
           </button>
           <h1 style={{ color: "#fff", fontSize: 26, fontWeight: 800, textAlign: "center", margin: 0, letterSpacing: 1 }}>{(club.clubName || "Hub FC").toUpperCase()} RATINGS</h1>
-          <button onClick={() => navigate('/login')}
-            style={{ position: "absolute", right: 0, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "6px 14px", color: "rgba(255,255,255,0.25)", fontSize: 10, fontWeight: 600, cursor: "pointer", letterSpacing: 0.5 }}>
-            Coach Login
-          </button>
+          <div style={{ position: "absolute", right: 0, display: "flex", gap: 6 }}>
+            <button onClick={() => navigate('/compare')}
+              style={{ background: "rgba(255,170,0,0.06)", border: "1px solid rgba(255,170,0,0.12)", borderRadius: 8, padding: "6px 14px", color: "rgba(255,170,0,0.5)", fontSize: 10, fontWeight: 600, cursor: "pointer" }}>
+              Compare
+            </button>
+            <button onClick={() => navigate('/login')}
+              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, padding: "6px 14px", color: "rgba(255,255,255,0.25)", fontSize: 10, fontWeight: 600, cursor: "pointer", letterSpacing: 0.5 }}>
+              Coach Login
+            </button>
+          </div>
         </div>
         <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 11, textAlign: "center", margin: "0 0 18px", letterSpacing: 2 }}>{players.length} LEARNERS</p>
 
