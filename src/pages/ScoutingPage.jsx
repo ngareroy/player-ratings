@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { subscribeTrials, saveTrial, removeTrial, convertTrialToPlayer, subscribeTeams, subscribeClubSettings } from '../firebase'
+import { subscribeTrials, saveTrial, removeTrial, convertTrialToPlayer, subscribeClubSettings } from '../firebase'
 import { ATTRS, GK_ATTRS, CAT_ORDER, CAT_FORMULAS, calcCategories, calcOverall, getRatingColor, getOvrBg } from '../utils'
 
 const VERDICTS = ["Pending", "Sign", "Reject", "Callback"]
@@ -9,7 +9,7 @@ const VERDICT_COLORS = { Pending: "rgba(255,255,255,0.3)", Sign: "#2ecc40", Reje
 
 const ALL_POSITIONS = ["GK", "CB", "LB", "RB", "CDM", "CM", "CAM", "LM", "RM", "LW", "RW", "ST"]
 
-function TrialModal({ trial, teams, onSave, onClose, coachName }) {
+function TrialModal({ trial, onSave, onClose, coachName }) {
     const [name, setName] = useState(trial?.name || "")
     const [dob, setDob] = useState(trial?.dob || "")
     const [trialDate, setTrialDate] = useState(trial?.trialDate || new Date().toISOString().slice(0, 10))
@@ -196,7 +196,6 @@ export default function ScoutingPage() {
     const { adminData, isHeadCoach } = useAuth()
     const navigate = useNavigate()
     const [trials, setTrials] = useState([])
-    const [teams, setTeams] = useState([])
     const [club, setClub] = useState({ clubName: "Hub FC" })
     const [modal, setModal] = useState(null)
     const [filter, setFilter] = useState("active")
@@ -205,9 +204,8 @@ export default function ScoutingPage() {
 
     useEffect(() => {
         const u1 = subscribeTrials(setTrials)
-        const u2 = subscribeTeams(setTeams)
-        const u3 = subscribeClubSettings(setClub)
-        return () => { u1(); u2(); u3() }
+        const u2 = subscribeClubSettings(setClub)
+        return () => { u1(); u2() }
     }, [])
 
     const filtered = useMemo(() => {
@@ -311,7 +309,7 @@ export default function ScoutingPage() {
                 </div>
             </div>
 
-            {modal && <TrialModal trial={modal === "new" ? null : modal} teams={teams} onSave={handleSave} onClose={() => setModal(null)} coachName={adminData?.name || "Coach"} />}
+            {modal && <TrialModal trial={modal === "new" ? null : modal} onSave={handleSave} onClose={() => setModal(null)} coachName={adminData?.name || "Coach"} />}
         </div>
     )
 }

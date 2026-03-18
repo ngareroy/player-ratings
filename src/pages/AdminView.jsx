@@ -136,6 +136,10 @@ export default function AdminView() {
               style={{ background: "rgba(46,204,64,0.06)", border: "1px solid rgba(46,204,64,0.12)", borderRadius: 8, padding: "7px 12px", color: "rgba(46,204,64,0.6)", fontSize: 10, fontWeight: 700, cursor: "pointer", letterSpacing: 0.5 }}>
               Formation
             </button>
+            <button onClick={() => navigate('/admin/scouting')}
+              style={{ background: "rgba(232,185,48,0.06)", border: "1px solid rgba(232,185,48,0.15)", borderRadius: 8, padding: "7px 12px", color: "rgba(232,185,48,0.7)", fontSize: 10, fontWeight: 700, cursor: "pointer", letterSpacing: 0.5 }}>
+              🔍 Scouting
+            </button>
             {/* Profile Avatar */}
             <button onClick={() => setShowProfile(true)}
               style={{
