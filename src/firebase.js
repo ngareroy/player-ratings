@@ -4,12 +4,12 @@ import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, si
 
 // 🔥 PASTE YOUR FIREBASE CONFIG HERE
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyAFLmRl_PoSF2bDdcD7-r0llmMcIzLNJAY",
+    authDomain: "player-ratings-e979f.firebaseapp.com",
+    projectId: "player-ratings-e979f",
+    storageBucket: "player-ratings-e979f.firebasestorage.app",
+    messagingSenderId: "882859560495",
+    appId: "1:882859560495:web:e7960f6d6b5e4315dac0da"
 }
 
 const app = initializeApp(firebaseConfig)
