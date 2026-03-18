@@ -4,12 +4,12 @@ import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, si
 
 // 🔥 PASTE YOUR FIREBASE CONFIG HERE
 const firebaseConfig = {
-    apiKey: "AIzaSyAFLmRl_PoSF2bDdcD7-r0llmMcIzLNJAY",
-    authDomain: "player-ratings-e979f.firebaseapp.com",
-    projectId: "player-ratings-e979f",
-    storageBucket: "player-ratings-e979f.firebasestorage.app",
-    messagingSenderId: "882859560495",
-    appId: "1:882859560495:web:e7960f6d6b5e4315dac0da"
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
 }
 
 const app = initializeApp(firebaseConfig)
@@ -131,6 +131,29 @@ export function subscribeSeasons(callback) {
     return onSnapshot(seasonsRef, (snapshot) => {
         const seasons = snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
         callback(seasons)
+    })
+}
+
+// ============ TRAINING NOTES (per player per session) ============
+
+const trainingNotesRef = collection(db, 'trainingNotes')
+
+export async function saveTrainingNotes(sessionId, notesMap) {
+    await setDoc(doc(db, 'trainingNotes', sessionId), { sessionId, notes: notesMap, updatedAt: new Date().toISOString() })
+}
+
+export function subscribeTrainingNotes(sessionId, callback) {
+    return onSnapshot(doc(db, 'trainingNotes', sessionId), (snap) => {
+        if (snap.exists()) callback(snap.data().notes || {})
+        else callback({})
+    })
+}
+
+export function subscribeAllTrainingNotes(callback) {
+    return onSnapshot(trainingNotesRef, (snapshot) => {
+        const map = {}
+        snapshot.docs.forEach(d => { map[d.id] = d.data() })
+        callback(map)
     })
 }
 

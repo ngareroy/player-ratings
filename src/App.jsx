@@ -13,6 +13,7 @@ import MatchDetail from './pages/MatchDetail'
 import ClubSettings from './pages/ClubSettings'
 import NewsDetail from './pages/NewsDetail'
 import AttendancePage from './pages/AttendancePage'
+import TrainingDetail from './pages/TrainingDetail'
 import ComparePlayers from './pages/ComparePlayers'
 
 function ProtectedRoute({ children, requireHeadCoach }) {
@@ -46,6 +47,7 @@ export default function App() {
       <Route path="/admin/matches/:matchId" element={<ProtectedRoute><MatchDetail /></ProtectedRoute>} />
       <Route path="/admin/club" element={<ProtectedRoute requireHeadCoach><ClubSettings /></ProtectedRoute>} />
       <Route path="/admin/attendance" element={<ProtectedRoute><AttendancePage /></ProtectedRoute>} />
+      <Route path="/admin/training/:sessionId" element={<ProtectedRoute><TrainingDetail /></ProtectedRoute>} />
       <Route path="/admin/:secretKey" element={<Navigate to="/login" replace />} />
     </Routes>
   )

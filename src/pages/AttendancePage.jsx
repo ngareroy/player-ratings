@@ -216,6 +216,10 @@ export default function AttendancePage() {
                                             </div>
                                         )}
                                         <div style={{ display: "flex", gap: 4 }} onClick={e => e.stopPropagation()}>
+                                            <button onClick={() => navigate(`/admin/training/${s.id}`)}
+                                                style={{ background: "rgba(46,204,64,0.06)", border: "1px solid rgba(46,204,64,0.12)", borderRadius: 4, padding: "3px 6px", color: "rgba(46,204,64,0.5)", fontSize: 9, fontWeight: 600, cursor: "pointer" }}>
+                                                Log
+                                            </button>
                                             <button onClick={() => setModal(s)} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 4, padding: "3px 6px", color: "rgba(255,255,255,0.25)", fontSize: 9, cursor: "pointer" }}>Edit</button>
                                             {isHeadCoach && (
                                                 confirmDelete === s.id ? (
