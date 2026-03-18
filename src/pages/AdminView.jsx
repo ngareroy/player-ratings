@@ -132,6 +132,10 @@ export default function AdminView() {
               style={{ background: "rgba(255,170,0,0.06)", border: "1px solid rgba(255,170,0,0.12)", borderRadius: 8, padding: "7px 12px", color: "rgba(255,170,0,0.6)", fontSize: 10, fontWeight: 700, cursor: "pointer", letterSpacing: 0.5 }}>
               Awards
             </button>
+            <button onClick={() => navigate('/admin/formation')}
+              style={{ background: "rgba(46,204,64,0.06)", border: "1px solid rgba(46,204,64,0.12)", borderRadius: 8, padding: "7px 12px", color: "rgba(46,204,64,0.6)", fontSize: 10, fontWeight: 700, cursor: "pointer", letterSpacing: 0.5 }}>
+              Formation
+            </button>
             {/* Profile Avatar */}
             <button onClick={() => setShowProfile(true)}
               style={{
