@@ -1,6 +1,6 @@
 # ⚽ Player Ratings
 
-A FIFA-inspired player rating and management system built for football academies and coaching staff. Track, evaluate, and showcase learner development with beautiful interactive player cards, radar charts, and position-weighted ratings.
+A FIFA-inspired player rating and management platform built for football academies and coaching staff. Track, evaluate, and showcase learner development with interactive player cards, radar charts, match tracking, formation building, scouting tools, and much more.
 
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
 ![Firebase](https://img.shields.io/badge/Firebase-Firestore-FFCA28?logo=firebase&logoColor=black)
@@ -11,36 +11,31 @@ A FIFA-inspired player rating and management system built for football academies
 
 ## 🎯 Overview
 
-Player Ratings provides a dual-view system — a **public view** for parents and learners to browse player profiles, and a **secret admin panel** for coaches to manage ratings, positions, and player data. All changes sync in real-time via Firebase.
+Player Ratings provides a dual-view system — a **public-facing portal** for parents and learners to explore player profiles, fixtures, and news, and a **protected admin panel** for coaches to manage every aspect of their squad. All data syncs in real-time via Firebase Firestore.
 
-### Public View
+### Public Portal
 > `yoursite.vercel.app`
 
-Parents and learners can browse player cards, sort by category, search by name, and click any card to view a detailed player profile.
+Accessible to anyone — browse player cards, compare players head-to-head, view upcoming and past fixtures, read club news, and submit self-assessments.
 
 ### Admin Panel
-> `yoursite.vercel.app/admin/your-secret-key`
+> `yoursite.vercel.app/login`
 
-Coaches can add, edit, and delete players, adjust all 19+ attributes via sliders, assign positions, and set jersey numbers.
+Role-based access for coaches. Head Coaches have full control; Assistant Coaches can edit ratings but cannot delete players or manage staff.
 
 ---
 
 ## ✨ Features
 
-### Player Cards
-- FIFA-style cards with overall rating badge, color-coded by tier (green → red)
+### 🃏 Player Cards & Profiles
+- FIFA-style cards with overall rating badge, color-coded by tier
 - Interactive radar/spider chart showing 6 category scores
-- Position badges and jersey number display
-- Hover animations and click-to-expand detail view
+- Position badges, jersey number, and team assignment display
+- Hover animations and click-to-expand full detail modal
+- Detail modal includes: large radar chart, mini pitch map, full attribute breakdown with progress bars, position rating comparisons, match stats, attendance history, training notes, self-assessment comparison, and award history
 
-### Position-Weighted Ratings
-- Each position (GK, CB, ST, CAM, etc.) has custom category weights
-- A CB's rating emphasizes defense (33%) and physicality (22%) while de-emphasizing attacking (2%)
-- A ST's rating weighs attacking at 33% and technical ability at 17%
-- Players can hold multiple positions with independent ratings for each
-
-### Smart Category System
-Ratings are auto-calculated from 19 base attributes grouped into 6 categories:
+### 📊 Rating System
+Ratings are calculated from **19 outfield attributes** grouped into 6 categories:
 
 | Category | Label | Derived From |
 |----------|-------|-------------|
@@ -51,37 +46,105 @@ Ratings are auto-calculated from 19 base attributes grouped into 6 categories:
 | Defense | DEF | Tackling, Ball Protection, Strength |
 | Mentality | MENT | Decision Making, Communication, Work Rate, Coachability, Discipline, Leadership Potential |
 
-### Goalkeeping Module
-- 5 additional GK-specific attributes: Diving, Handling, Kicking, Reflexes, GK Positioning
-- GK sliders are greyed out and locked until the GK position is assigned
-- GK position rating weighs goalkeeping attributes at 50%
-- Players can be dual-role (e.g., ST + GK) with separate ratings for each
+The **Overall Rating** shown on each card is the **best position-weighted rating** across all assigned positions — a CB isn't penalized for low attacking stats.
 
-### Player Detail Modal
-- Full-screen splash view when clicking any player card
-- Large radar chart with all 6 category breakdowns
-- Mini pitch map showing active positions with rating-colored markers
-- Complete attribute list with progress bars organized by category
-- Position rating comparison
+### 🥅 Goalkeeping Module
+- 5 GK-specific attributes: Diving, Handling, Kicking, Reflexes, GK Positioning
+- GK sliders only appear when the GK position is selected
+- GK position rating weights goalkeeping at 50%
+- Players can be dual-role (e.g., ST + GK) with independent ratings for each
 
-### Mini Pitch Map
-- Football Manager-inspired pitch visualization
-- Shows all standard positions as markers on a top-down pitch
-- Active positions light up with rating-based colors (green/yellow/orange/red)
-- GK position uses distinct amber color scheme
-- Pitch legend with per-position ratings
+### 🔢 Position-Weighted Ratings
 
-### Jersey Number Management
-- Single jersey number for outfield-only or GK-only players
-- Dual jersey numbers when a player plays both GK and outfield
-- Validation prevents duplicate jersey numbers across the squad
+| Category | ST | CB | GK |
+|----------|-----|-----|-----|
+| Technical | 17% | 8% | 4% |
+| Passing | 10% | 10% | 4% |
+| Attacking | 33% | 2% | 2% |
+| Physical | 20% | 22% | 16% |
+| Defense | 2% | 33% | 10% |
+| Mentality | 18% | 25% | 14% |
+| Goalkeeping | — | — | 50% |
 
-### Admin Features
-- Add new learners with all attributes via slider interface
-- Edit existing player ratings with live preview of category scores
-- Delete players with confirmation
-- Multi-position selection grouped by GK / DEF / MID / ATT
-- Real-time position rating preview while editing
+Full weight tables exist for all 15 positions: GK, CB, LB, RB, LWB, RWB, CDM, CM, CAM, LM, RM, LW, RW, CF, ST.
+
+### 🏟️ Formation Builder
+- 8 formations available: 4-4-2, 4-3-3, 4-2-3-1, 3-5-2, 4-1-4-1, 3-4-3, 5-3-2, 4-3-2-1
+- Visual pitch with drag-and-drop player assignment to slots
+- Each player shows their **position-specific rating** once placed
+- **Auto-Fill Best XI** — automatically picks the highest-rated player for each slot
+- Team average rating displayed as players are filled in
+- Filter player pool by team; clear all and start fresh
+
+### ⚽ Match Centre
+- Create and manage fixtures (home/away, date, opponent, venue)
+- Live match detail page for recording player performance stats
+- Per-player stat tracking: goals, assists, yellow/red cards, rating, played/subbed
+- Match results and stats feed into player detail profiles
+- Head coach can delete matches; all associated stats are cleaned up automatically
+
+### 📋 Attendance & Training
+- Session-based attendance tracking (Present / Late / Absent / Excused)
+- Attendance history visible per player in their detail modal
+- Training detail page with per-session notes for each player
+- Notes are stored per-session and accessible from player profiles
+
+### 🧑‍🤝‍🧑 Multi-Team Support
+- Create and manage multiple age-group teams (e.g., U10, U12, U15)
+- Players can belong to multiple teams simultaneously
+- Age-based team suggestion when adding new players
+- Filter players, formations, and scouting by team
+
+### 📝 Assessment System
+- Coaches can open and close named assessment periods (e.g., "Term 1", "Pre-season")
+- When an assessment is active, every rating save creates a historical snapshot
+- Snapshot history is used to power the **Biggest Improvers** leaderboard
+- Leaderboard shows improvement deltas and is visible on the admin dashboard
+
+### 🔍 Scouting (Trial Players)
+- Add trial players with the same full attribute slider system as regular players
+- Record trial date, source/referral, parent contact, positions, and scout notes
+- Set a verdict: Pending / Sign / Reject / Callback
+- **Convert to Squad** — one-click promotion from trial to full player profile
+- Filter trials by Active / Signed / Rejected
+- Signed trials are archived with a converted timestamp
+
+### 🏆 Awards
+- Give awards to players with preset templates or fully custom emoji + label
+- Templates include: Most Improved, Player of the Term, Golden Boot, Golden Glove, Rising Star, and more
+- Optional reason field for each award
+- Awards appear in the player's detail modal
+- Top awarded players leaderboard on the awards page
+
+### 🆚 Player Comparison
+- Side-by-side comparison of any two players
+- Radar chart overlay, category scores, and full attribute breakdown
+- Best position ratings shown for both players
+
+### 📰 Club News
+- Coaches can publish, edit, and delete news posts
+- Public news detail pages with full content
+- Feed visible on the public homepage
+
+### 📅 Fixtures (Public)
+- Public fixtures page listing upcoming and completed matches
+- Separate upcoming/results tabs with opponent, venue, date, and score
+
+### 🪞 Self-Assessment
+- Players can submit self-assessments using an access code
+- Ratings submitted via self-assessment are stored separately
+- Coaches can compare coach ratings vs player self-assessment in the detail modal
+
+### 👤 Coach Profiles & Staff Management
+- Each coach has a profile with name, avatar (emoji or initial), and color
+- Head Coaches can invite assistant coaches via email
+- Head Coaches can manage roles, update staff details, and remove coaches
+- Profile modal accessible from the admin dashboard top bar
+
+### 🏠 Club Settings
+- Set club name, motto, about text, primary color, and logo emoji
+- Club name propagates across all pages (admin header, scouting title, awards title, etc.)
+- Head Coach only access
 
 ---
 
@@ -91,9 +154,27 @@ Ratings are auto-calculated from 19 base attributes grouped into 6 categories:
 |-------|-----------|
 | Frontend | React 19, Vite 6 |
 | Routing | React Router DOM |
-| Database | Firebase Firestore (real-time sync) |
+| Database | Firebase Firestore (real-time subscriptions) |
+| Auth | Firebase Authentication (Email + Google SSO) |
 | Hosting | Vercel |
 | Styling | Inline styles (no CSS framework) |
+
+---
+
+## 🔐 Role System
+
+| Permission | Head Coach | Assistant Coach |
+|------------|-----------|-----------------|
+| View & edit player ratings | ✅ | ✅ |
+| Add players | ✅ | ✅ |
+| Delete players | ✅ | ❌ |
+| Manage teams & formations | ✅ | ❌ |
+| Invite / remove coaches | ✅ | ❌ |
+| Club settings | ✅ | ❌ |
+| Open / close assessments | ✅ | ✅ |
+| Give awards | ✅ | ✅ |
+| Manage matches | ✅ | ✅ |
+| Scouting / trials | ✅ | ✅ |
 
 ---
 
@@ -101,7 +182,7 @@ Ratings are auto-calculated from 19 base attributes grouped into 6 categories:
 
 ### Prerequisites
 - Node.js 18+
-- A Firebase project with Firestore enabled
+- A Firebase project with Firestore and Authentication enabled
 - A Vercel account (for deployment)
 
 ### Installation
@@ -112,11 +193,12 @@ cd player-ratings
 npm install
 ```
 
-### Configuration
+### Firebase Configuration
 
 1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
-2. Enable Firestore in test mode
-3. Update `src/firebase.js` with your Firebase config:
+2. Enable **Firestore** in test mode
+3. Enable **Authentication** — turn on Email/Password and Google providers
+4. Update `src/firebase.js` with your config:
 
 ```js
 const firebaseConfig = {
@@ -129,11 +211,7 @@ const firebaseConfig = {
 }
 ```
 
-4. Set your admin secret key in the same file:
-
-```js
-export const ADMIN_SECRET = 'your-secret-key'
-```
+5. Create your first admin by running `importPlayers.mjs` or manually adding a document to the `admins` Firestore collection with `role: "head_coach"`.
 
 ### Development
 
@@ -141,8 +219,8 @@ export const ADMIN_SECRET = 'your-secret-key'
 npm run dev
 ```
 
-- Public view: `http://localhost:5173`
-- Admin panel: `http://localhost:5173/admin/your-secret-key`
+- Public portal: `http://localhost:5173`
+- Admin panel: `http://localhost:5173/login`
 
 ### Deployment
 
@@ -161,38 +239,51 @@ git push
 ```
 src/
 ├── components/
-│   ├── MiniPitch.jsx          # Pitch position map
-│   ├── Modal.jsx              # Admin add/edit modal
-│   ├── PlayerCard.jsx         # Player card with radar chart
-│   ├── PlayerDetailModal.jsx  # Full player detail view
-│   └── RadarChart.jsx         # SVG radar/spider chart
+│   ├── CoachProfileModal.jsx      # Coach profile editor
+│   ├── ImproversLeaderboard.jsx   # Biggest improvers widget
+│   ├── InviteCoachModal.jsx       # Staff invite modal
+│   ├── MiniPitch.jsx              # Pitch position map
+│   ├── Modal.jsx                  # Player add/edit modal
+│   ├── PlayerAttendance.jsx       # Per-player attendance view
+│   ├── PlayerAwards.jsx           # Per-player awards list
+│   ├── PlayerCard.jsx             # Player card with radar chart
+│   ├── PlayerDetailModal.jsx      # Full player detail view
+│   ├── PlayerMatchStats.jsx       # Per-player match stats
+│   ├── PlayerTrainingNotes.jsx    # Per-player training notes
+│   ├── ProgressChart.jsx          # Rating history line chart
+│   ├── RadarChart.jsx             # SVG radar/spider chart
+│   ├── ReportButton.jsx           # PDF report generator
+│   └── SelfAssessCompare.jsx      # Coach vs self-assessment comparison
+├── contexts/
+│   └── AuthContext.jsx            # Auth state, role helpers
 ├── pages/
-│   ├── AdminView.jsx          # Coach admin panel
-│   └── PublicView.jsx         # Public player gallery
-├── App.jsx                    # Route definitions
-├── firebase.js                # Firebase config & CRUD operations
-├── main.jsx                   # App entry point
-└── utils.js                   # Rating formulas, constants, helpers
+│   ├── AdminView.jsx              # Main admin dashboard
+│   ├── AssessmentManager.jsx      # Assessment period management
+│   ├── AttendancePage.jsx         # Session attendance tracker
+│   ├── AwardsPage.jsx             # Awards management
+│   ├── ClubSettings.jsx           # Club branding settings
+│   ├── ComparePlayers.jsx         # Side-by-side player comparison
+│   ├── FormationBuilder.jsx       # Drag-and-drop formation tool
+│   ├── HomePage.jsx               # Public club homepage
+│   ├── LoginPage.jsx              # Coach login (email + Google)
+│   ├── ManageTeam.jsx             # Staff & invite management
+│   ├── MatchCenter.jsx            # Fixtures list & creation
+│   ├── MatchDetail.jsx            # Live match stats entry
+│   ├── NewsDetail.jsx             # Public news article view
+│   ├── PublicFixtures.jsx         # Public fixtures & results
+│   ├── PublicView.jsx             # Public player gallery
+│   ├── ScoutingPage.jsx           # Trial player management
+│   ├── SelfAssessPage.jsx         # Player self-assessment portal
+│   ├── TeamManager.jsx            # Age-group team management
+│   └── TrainingDetail.jsx         # Session training notes
+├── utils/
+│   └── generateReport.js          # PDF report generation
+├── App.jsx                        # Route definitions
+├── firebase.js                    # Firebase config & all Firestore ops
+├── main.jsx                       # App entry point
+├── utils.js                       # Rating formulas, constants, helpers
+└── global.css                     # Global base styles
 ```
-
----
-
-## 📊 Rating System
-
-### Overall Rating
-The overall rating displayed on each card is the **best position-weighted rating** across all assigned positions. This means a defender isn't penalized for low attacking stats — their rating reflects how good they are at their actual position.
-
-### Position Weights Example
-
-| Category | ST | CB | GK |
-|----------|-----|-----|-----|
-| Technical | 17% | 8% | 4% |
-| Passing | 10% | 10% | 4% |
-| Attacking | 33% | 2% | 2% |
-| Physical | 20% | 22% | 16% |
-| Defense | 2% | 33% | 10% |
-| Mentality | 18% | 25% | 14% |
-| Goalkeeping | — | — | 50% |
 
 ---
 
@@ -205,18 +296,6 @@ The overall rating displayed on each card is the **best position-weighted rating
 | 60–69 | 🟡 Yellow | Average |
 | 50–59 | 🟠 Orange | Below Average |
 | 0–49 | 🔴 Red | Poor |
-
----
-
-## 🗺️ Roadmap
-
-- [ ] Club homepage with team info and branding
-- [ ] Player photo uploads
-- [ ] Historical rating tracking and progress charts
-- [ ] Team formation builder
-- [ ] Match day squad selection
-- [ ] PDF report exports
-- [ ] Multi-team support
 
 ---
 
