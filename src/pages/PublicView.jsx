@@ -4,6 +4,7 @@ import { subscribePlayers, subscribeTeams, subscribeClubSettings } from '../fire
 import { calcBestRating, calcOverall, calcCategories, CAT_ORDER, CAT_LABELS } from '../utils'
 import PlayerCard from '../components/PlayerCard'
 import PlayerDetailModal from '../components/PlayerDetailModal'
+import ImproversLeaderboard from '../components/ImproversLeaderboard'
 
 export default function PublicView() {
   const [players, setPlayers] = useState([])
@@ -14,6 +15,7 @@ export default function PublicView() {
   const [club, setClub] = useState({ clubName: "Hub FC", logoEmoji: "⚽" })
   const [loading, setLoading] = useState(true)
   const [detailPlayer, setDetailPlayer] = useState(null)
+  const [showLeaderboard, setShowLeaderboard] = useState(false)
 
   useEffect(() => {
     const unsub = subscribePlayers((data) => {
@@ -113,6 +115,20 @@ export default function PublicView() {
                   fontSize: 10, fontWeight: 700, cursor: "pointer", letterSpacing: 0.3
                 }}>{t.label}</button>
             ))}
+          </div>
+        )}
+
+        {/* Leaderboard Toggle */}
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: showLeaderboard ? 0 : 8 }}>
+          <button onClick={() => setShowLeaderboard(!showLeaderboard)}
+            style={{ background: "rgba(255,170,0,0.04)", border: "1px solid rgba(255,170,0,0.1)", borderRadius: 8, padding: "5px 14px", color: "rgba(255,170,0,0.5)", fontSize: 10, fontWeight: 700, cursor: "pointer", letterSpacing: 0.5 }}>
+            {showLeaderboard ? "Hide Improvers ▲" : "🏆 Biggest Improvers ▼"}
+          </button>
+        </div>
+
+        {showLeaderboard && (
+          <div style={{ maxWidth: 500, margin: "8px auto 16px", background: "linear-gradient(145deg,#1a1a2e,#16213e)", borderRadius: 14, border: "1px solid rgba(255,255,255,0.08)", padding: "14px 18px" }}>
+            <ImproversLeaderboard limit={10} showTitle={true} />
           </div>
         )}
 

@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { subscribeClubSettings, subscribeNews, subscribeMatches, subscribeTeams, subscribePlayers } from '../firebase'
+import ImproversLeaderboard from '../components/ImproversLeaderboard'
 
 export default function HomePage() {
   const navigate = useNavigate()
@@ -252,6 +253,14 @@ export default function HomePage() {
                 </div>
               </>
             )}
+
+            {/* Biggest Improvers */}
+            <div style={{ marginTop: 20 }}>
+              <h2 style={{ color: "#fff", fontSize: 18, fontWeight: 800, margin: "0 0 14px", letterSpacing: 0.5 }}>Biggest Improvers</h2>
+              <div style={{ background: "linear-gradient(145deg,#1a1a2e,#16213e)", borderRadius: 14, border: "1px solid rgba(255,255,255,0.06)", padding: "14px 18px" }}>
+                <ImproversLeaderboard limit={5} showTitle={false} />
+              </div>
+            </div>
           </div>
         </div>
       </div>
