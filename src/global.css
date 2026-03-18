@@ -1,0 +1,159 @@
+/* Global styles and mobile optimization */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #0a0a1a;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Better touch targets on mobile */
+button,
+input,
+select,
+textarea {
+    font-family: system-ui, -apple-system, sans-serif;
+    -webkit-appearance: none;
+}
+
+/* Range slider mobile fix */
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+    height: 20px;
+}
+
+input[type="range"]::-webkit-slider-track {
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: currentColor;
+    margin-top: -6px;
+    border: 2px solid #fff;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Mobile responsive overrides */
+@media (max-width: 768px) {
+
+    /* Admin top bar — stack vertically */
+    .admin-topbar {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+
+    /* Make nav buttons scroll horizontally on mobile */
+    .nav-buttons {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        white-space: nowrap;
+        padding-bottom: 4px;
+    }
+
+    .nav-buttons::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Player cards — 1 column on small screens */
+    .player-grid {
+        gap: 12px !important;
+    }
+
+    /* Modals take full width on mobile */
+    .modal-content {
+        max-width: 100% !important;
+        border-radius: 12px !important;
+        max-height: 95vh !important;
+    }
+
+    /* Formation pitch aspect ratio on mobile */
+    .pitch-container {
+        max-width: 100% !important;
+    }
+
+    /* General font size adjustments */
+    h1 {
+        font-size: 20px !important;
+    }
+}
+
+@media (max-width: 480px) {
+
+    /* Even smaller screens */
+    h1 {
+        font-size: 18px !important;
+    }
+
+    /* Stack filter buttons */
+    .filter-row {
+        justify-content: flex-start !important;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        flex-wrap: nowrap !important;
+        scrollbar-width: none;
+        padding-bottom: 4px;
+    }
+
+    .filter-row::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+/* Pulse animation for active assessment indicator */
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.4;
+    }
+}
+
+/* Safe area padding for notch phones */
+@supports (padding: max(0px)) {
+    body {
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+}

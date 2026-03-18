@@ -134,6 +134,34 @@ export function subscribeSeasons(callback) {
     })
 }
 
+// ============ SCOUTING / TRIALS ============
+
+const trialsRef = collection(db, 'trials')
+
+export async function saveTrial(trial) {
+    await setDoc(doc(db, 'trials', trial.id), trial)
+}
+
+export async function removeTrial(id) {
+    await deleteDoc(doc(db, 'trials', id))
+}
+
+export function subscribeTrials(callback) {
+    return onSnapshot(trialsRef, (snapshot) => {
+        const list = snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
+        callback(list)
+    })
+}
+
+// Convert trial player to full player
+export async function convertTrialToPlayer(trial) {
+    const { id, status, trialDate, trialNotes, source, parentContact, verdict, ...playerData } = trial
+    const newId = Date.now().toString()
+    await setDoc(doc(db, 'players', newId), { ...playerData, id: newId })
+    await setDoc(doc(db, 'trials', id), { ...trial, status: 'signed', convertedId: newId, convertedAt: new Date().toISOString() })
+    return newId
+}
+
 // ============ SELF ASSESSMENTS ============
 
 const selfAssessRef = collection(db, 'selfAssessments')
