@@ -134,6 +134,44 @@ export function subscribeSeasons(callback) {
     })
 }
 
+// ============ TRAINING SESSIONS & ATTENDANCE ============
+
+const sessionsRef = collection(db, 'sessions')
+
+export async function saveSession(session) {
+    await setDoc(doc(db, 'sessions', session.id), session)
+}
+
+export async function removeSession(id) {
+    await deleteDoc(doc(db, 'sessions', id))
+}
+
+export function subscribeSessions(callback) {
+    return onSnapshot(sessionsRef, (snapshot) => {
+        const list = snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
+        callback(list)
+    })
+}
+
+export async function saveAttendance(sessionId, attendanceMap) {
+    await setDoc(doc(db, 'attendance', sessionId), { sessionId, players: attendanceMap, updatedAt: new Date().toISOString() })
+}
+
+export function subscribeAttendance(callback) {
+    return onSnapshot(collection(db, 'attendance'), (snapshot) => {
+        const map = {}
+        snapshot.docs.forEach(d => { map[d.id] = d.data() })
+        callback(map)
+    })
+}
+
+export function subscribeSessionAttendance(sessionId, callback) {
+    return onSnapshot(doc(db, 'attendance', sessionId), (snap) => {
+        if (snap.exists()) callback(snap.data().players || {})
+        else callback({})
+    })
+}
+
 // ============ CLUB SETTINGS ============
 
 export async function getClubSettings() {

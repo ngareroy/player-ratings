@@ -2,10 +2,13 @@ import RadarChart from './RadarChart'
 import MiniPitch from './MiniPitch'
 import ProgressChart from './ProgressChart'
 import PlayerMatchStats from './PlayerMatchStats'
+import PlayerAttendance from './PlayerAttendance'
 import ReportButton from './ReportButton'
-import { ATTRS, GK_ATTRS, CAT_ORDER, CAT_FORMULAS, CAT_LABELS,
-         calcCategories, calcGkCategory, calcBestRating, calcOverall,
-         calcAllPositionRatings, calcAge, getRatingColor, getOvrBg } from '../utils'
+import {
+  ATTRS, GK_ATTRS, CAT_ORDER, CAT_FORMULAS, CAT_LABELS,
+  calcCategories, calcGkCategory, calcBestRating, calcOverall,
+  calcAllPositionRatings, calcAge, getRatingColor, getOvrBg
+} from '../utils'
 
 export default function PlayerDetailModal({ player, rank, onClose, teamNames }) {
   const cats = calcCategories(player)
@@ -133,7 +136,8 @@ export default function PlayerDetailModal({ player, rank, onClose, teamNames }) 
                       display: "flex", alignItems: "center", gap: 4,
                       background: "rgba(255,255,255,0.03)", borderRadius: 6, padding: "4px 8px"
                     }}>
-                      <span style={{ width: 8, height: 8, borderRadius: "50%", flexShrink: 0,
+                      <span style={{
+                        width: 8, height: 8, borderRadius: "50%", flexShrink: 0,
                         background: p === "GK" ? "#ffaa00" : getRatingColor(rating),
                         boxShadow: `0 0 4px ${p === "GK" ? "rgba(255,170,0,0.4)" : getRatingColor(rating) + "44"}`
                       }} />
@@ -157,6 +161,12 @@ export default function PlayerDetailModal({ player, rank, onClose, teamNames }) 
         <div style={{ padding: "16px 24px 8px", borderTop: "1px solid rgba(255,255,255,0.04)" }}>
           <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.3)", letterSpacing: 2, marginBottom: 10 }}>MATCH STATS</div>
           <PlayerMatchStats playerId={player.id} />
+        </div>
+
+        {/* Attendance */}
+        <div style={{ padding: "16px 24px 8px", borderTop: "1px solid rgba(255,255,255,0.04)" }}>
+          <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.3)", letterSpacing: 2, marginBottom: 10 }}>ATTENDANCE</div>
+          <PlayerAttendance playerId={player.id} />
         </div>
 
         {/* All Attributes by Category */}

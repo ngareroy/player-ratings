@@ -36,7 +36,7 @@ export default function AdminView() {
 
   const activeAssessment = useMemo(() =>
     assessments.find(a => a.status === 'open') || null
-  , [assessments])
+    , [assessments])
 
   const enriched = useMemo(() =>
     players.map(p => {
@@ -44,7 +44,7 @@ export default function AdminView() {
       const best = positions.length > 0 ? calcBestRating(p) : calcOverall(p)
       return { ...p, cats: calcCategories(p), total: best }
     })
-  , [players])
+    , [players])
 
   const ranks = useMemo(() => {
     const s = [...enriched].sort((a, b) => b.total - a.total)
@@ -116,7 +116,11 @@ export default function AdminView() {
             )}
             <button onClick={() => navigate('/admin/matches')}
               style={{ background: "rgba(155,89,182,0.08)", border: "1px solid rgba(155,89,182,0.15)", borderRadius: 8, padding: "7px 12px", color: "rgba(155,89,182,0.7)", fontSize: 10, fontWeight: 700, cursor: "pointer", letterSpacing: 0.5 }}>
-              Match Center
+              Matches
+            </button>
+            <button onClick={() => navigate('/admin/attendance')}
+              style={{ background: "rgba(52,152,219,0.08)", border: "1px solid rgba(52,152,219,0.15)", borderRadius: 8, padding: "7px 12px", color: "rgba(52,152,219,0.7)", fontSize: 10, fontWeight: 700, cursor: "pointer", letterSpacing: 0.5 }}>
+              Attendance
             </button>
             {/* Profile Avatar */}
             <button onClick={() => setShowProfile(true)}

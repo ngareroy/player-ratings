@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { subscribePlayerMatchStats, subscribePlayerHistory, subscribeClubSettings } from '../firebase'
+import { subscribePlayerMatchStats, subscribePlayerHistory, subscribeClubSettings, subscribeSessions, subscribeAttendance } from '../firebase'
 import { generatePlayerReport } from '../generateReport'
 
 export default function ReportButton({ player, teamNames }) {
@@ -7,22 +7,40 @@ export default function ReportButton({ player, teamNames }) {
   const [matchStats, setMatchStats] = useState([])
   const [history, setHistory] = useState([])
   const [club, setClub] = useState({ clubName: "Hub FC" })
+  const [sessions, setSessions] = useState([])
+  const [attendance, setAttendance] = useState({})
   const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
     if (!player?.id) return
     let count = 0
-    const check = () => { count++; if (count >= 3) setLoaded(true) }
+    const check = () => { count++; if (count >= 5) setLoaded(true) }
     const u1 = subscribePlayerMatchStats(player.id, (d) => { setMatchStats(d); check() })
     const u2 = subscribePlayerHistory(player.id, (d) => { setHistory(d); check() })
     const u3 = subscribeClubSettings((d) => { setClub(d); check() })
-    return () => { u1(); u2(); u3() }
+    const u4 = subscribeSessions(d => { setSessions(d); check() })
+    const u5 = subscribeAttendance(d => { setAttendance(d); check() })
+    return () => { u1(); u2(); u3(); u4(); u5() }
   }, [player?.id])
+
+  // Calculate attendance for this player
+  const attendanceData = (() => {
+    let total = 0, present = 0, late = 0
+    sessions.forEach(s => {
+      const a = attendance[s.id]?.players || {}
+      if (a[player.id] !== undefined) {
+        total++
+        if (a[player.id] === "present") present++
+        else if (a[player.id] === "late") late++
+      }
+    })
+    return { total, present, late, absent: total - present - late, rate: total > 0 ? ((present + late) / total * 100) : 0 }
+  })()
 
   const handleGenerate = async () => {
     setGenerating(true)
     try {
-      await generatePlayerReport(player, club, teamNames, matchStats, history)
+      await generatePlayerReport(player, club, teamNames, matchStats, history, attendanceData)
     } catch (err) {
       console.error("Report generation failed:", err)
       alert("Failed to generate report. Please try again.")
