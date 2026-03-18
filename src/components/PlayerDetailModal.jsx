@@ -5,6 +5,7 @@ import ProgressChart from './ProgressChart'
 import PlayerMatchStats from './PlayerMatchStats'
 import PlayerAttendance from './PlayerAttendance'
 import PlayerTrainingNotes from './PlayerTrainingNotes'
+import PlayerAwards from './PlayerAwards'
 import ReportButton from './ReportButton'
 import {
   ATTRS, GK_ATTRS, CAT_ORDER, CAT_FORMULAS, CAT_LABELS,
@@ -101,6 +102,12 @@ export default function PlayerDetailModal({ player, rank, onClose, teamNames }) 
             ))}
           </div>
         )}
+
+        {/* Awards */}
+        <div style={{ padding: "12px 24px 8px", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+          <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.3)", letterSpacing: 2, marginBottom: 10 }}>AWARDS & ACHIEVEMENTS</div>
+          <PlayerAwards playerId={player.id} />
+        </div>
 
         {/* Radar + Category Stats (big, like before) */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", flexWrap: "wrap", padding: "12px 20px 0", gap: 8 }}>

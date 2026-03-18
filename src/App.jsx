@@ -15,6 +15,7 @@ import NewsDetail from './pages/NewsDetail'
 import AttendancePage from './pages/AttendancePage'
 import TrainingDetail from './pages/TrainingDetail'
 import ComparePlayers from './pages/ComparePlayers'
+import AwardsPage from './pages/AwardsPage'
 
 function ProtectedRoute({ children, requireHeadCoach }) {
   const { user, isAdmin, isHeadCoach, loading } = useAuth()
@@ -48,6 +49,7 @@ export default function App() {
       <Route path="/admin/club" element={<ProtectedRoute requireHeadCoach><ClubSettings /></ProtectedRoute>} />
       <Route path="/admin/attendance" element={<ProtectedRoute><AttendancePage /></ProtectedRoute>} />
       <Route path="/admin/training/:sessionId" element={<ProtectedRoute><TrainingDetail /></ProtectedRoute>} />
+      <Route path="/admin/awards" element={<ProtectedRoute><AwardsPage /></ProtectedRoute>} />
       <Route path="/admin/:secretKey" element={<Navigate to="/login" replace />} />
     </Routes>
   )

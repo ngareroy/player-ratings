@@ -134,6 +134,25 @@ export function subscribeSeasons(callback) {
     })
 }
 
+// ============ AWARDS ============
+
+const awardsRef = collection(db, 'awards')
+
+export async function saveAward(award) {
+    await setDoc(doc(db, 'awards', award.id), award)
+}
+
+export async function removeAward(id) {
+    await deleteDoc(doc(db, 'awards', id))
+}
+
+export function subscribeAwards(callback) {
+    return onSnapshot(awardsRef, (snapshot) => {
+        const list = snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
+        callback(list)
+    })
+}
+
 // ============ TRAINING NOTES (per player per session) ============
 
 const trainingNotesRef = collection(db, 'trainingNotes')
