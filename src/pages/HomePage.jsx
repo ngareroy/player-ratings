@@ -268,7 +268,7 @@ export default function HomePage() {
       {/* Footer */}
       <div style={{ borderTop: "1px solid rgba(255,255,255,0.04)", padding: "20px", textAlign: "center" }}>
         <p style={{ color: "rgba(255,255,255,0.15)", fontSize: 11, margin: 0 }}>
-          {club.clubName} · Powered by Player Ratings
+          {club.clubName} · Powered by TrapKNG.org
         </p>
       </div>
     </div>
